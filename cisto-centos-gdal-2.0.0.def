@@ -1,0 +1,32 @@
+#-------------------------------------------------------------------------------
+# dsg10x runs Centos
+#-------------------------------------------------------------------------------
+#FROM centos
+# yum upgrade-minimal
+
+#Bootstrap: docker
+#FROM: centos
+
+Bootstrap: localimage
+FROM: ./cisto-centos-gdal-1.0.0.simg
+
+%environment
+	export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib:$LD_LIBRARY_PATH
+
+%post
+
+
+#-------------------------------------------------------------------------------
+# Create a user.
+#-------------------------------------------------------------------------------
+#export ilPw=mungeIt
+
+# adduser -p $(openssl passwd -crypt $ilPw) ilUser \
+#	&& usermod -aG wheel ilUser
+
+#USER ilUser
+#export homeDir="/home/ilUser"
+# echo "umask 0000" >> ~/.bashrc \
+#	&& echo "export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/#local/lib" >> ~/.bashrc
+
+
