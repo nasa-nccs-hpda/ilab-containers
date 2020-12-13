@@ -1,0 +1,14 @@
+# https://github.com/nickjer/singularity-r/blob/master/Singularity.3.6.2
+Bootstrap: localimage
+FROM: ./ilab-r-3.6.3.simg
+
+%post
+
+  # Install java
+#  add-apt-repository ppa:marutter/c2d4u3.5
+  apt-get update
+  apt-get install -y --no-install-recommends default-jre
+  apt-get install -y --no-install-recommends default-jdk
+  apt-get install -y --no-install-recommends r-api-3
+  apt-get install -y r-cran-rjava
+

@@ -1,0 +1,47 @@
+## Generate Python ecosystem container image using singularity recipe
+Bootstrap: localimage
+FROM: ./ilab-salad-1.1.0.simg
+
+%labels
+    Author Glenn Tamkin Cresson <glenn.s.tamkin[at]nasa[dot]gov>
+    Author Remi Cresson <remi.cresson[at]irstea[dot]fr>
+    Version v1.0.0
+
+%help
+===========================================================================
+        - Landslide Container:
+	-	Landslide Hazard Analysis for Situational Awareness (LHASA)
+	-	Semi-Automatic Landslide Detection System (SALaD)
+	-	Orfeo Toolbox (without Tensor Flow)
+===========================================================================
+
+%environment
+    # ----------------------------------------------------------------------------
+    # Add important environment variables
+    # ----------------------------------------------------------------------------
+
+    # set PYTHONPATH for access to LHASA application
+    export PYTHONPATH="$PYTHONPATH:/usr/local/lhasa/project"
+
+%post
+
+    pip install --upgrade affine==2.3.0
+    pip install --upgrade geopandas==0.8.1
+    pip install --upgrade netcdf4==1.5.4
+    pip install --upgrade numpy==1.19.1
+    pip install --upgrade pandas==1.1.1
+    pip install --upgrade pydap==3.2.2
+    pip install --upgrade rasterio==1.1.5
+    pip install --upgrade shapely==1.7.1
+    pip install --upgrade xarray==0.16.0
+    pip install --upgrade xgboost==1.2.0
+
+    pip install --upgrade requests==2.24.0
+    pip install --upgrade urllib3==1.25.10
+
+    # retrieve LHASA source from git repository and open permissions
+    mkdir -p /usr/local/lhasa
+    git clone --single-branch --branch LHASA-container https://github.com/nasa-nccs-hpda/innovation-lab.git /usr/local/lhasa
+    chmod a+rwx -R /usr/local/lhasa
+
+

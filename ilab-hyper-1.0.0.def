@@ -1,0 +1,24 @@
+## Generate hyperspectral container
+Bootstrap: localimage
+FROM: ./ilab-core-6.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-core (extends -> python3-data-science) – contains GIS & ilab dependencies:
+		a.	GDAL
+		b.	Celery
+		c.  	Redis (Celery server)
+===========================================================================
+%files
+
+    ./opt/hyper-requirements.txt
+
+%post
+
+    #pip install Hyperspectral dependencies
+    python -m pip install -r /opt/hyper-requirements.txt 
+
