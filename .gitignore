@@ -1,2 +1,5 @@
 *.simg
 *.tar
+*.gz
+*.xz
+*.zip
