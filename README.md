@@ -33,6 +33,63 @@ Containers are built hiearchically.  For example, the based Python scientific sy
 | ilab-r-*     | general purpose R environment         |   docker: ubuntu:18.04 | Ubuntu |
 | ilab-salad-*      | IL emi-Automatic Landslide Detection System (SALaD) application | singularity: ilab-otb-gpu-2.0.0.simg | Ubuntu |
 
+# Container Access
+
+The IL containers can be hosted on any platform with a Singularity client.  For user convenience and centralized management, the containers are available on ADAPT.  To access them, log into dsg103 (or equivalent VM) and navigate to the shared iluser container directory: 
+
+gtamkin@dsg103:~$ cd /att/gpfsfs/briskfs01/ppl/iluser/containers
+gtamkin@dsg103:/att/gpfsfs/briskfs01/ppl/iluser/containers$ ls -alt *.simg
+-rwxr-xr-x 1 iluser  ilab   1089593344 Dec 10 21:08 cisto-centos-gdal-2.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   3959197696 Dec  2 08:26 conda-gdal-vanilla.simg
+-rwxr-xr-x 1 root    root   1012498432 Nov 18 11:37 cisto-jupyter-lab-2.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1175150592 Nov  2 16:23 ilab-core-7.0.3.simg
+-rwxr-xr-x 1 iluser  ilab   1175126016 Oct 28 22:40 ilab-core-7.0.2.simg
+-rwxr-xr-x 1 iluser  ilab   1175121920 Oct 28 22:05 ilab-core-7.0.1.simg
+-rwxr-xr-x 1 root    root    893939712 Oct  8 10:43 test-cisto-data-science-3.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1017962496 Oct  6 18:43 ilab-core-6.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   4103323648 Sep  9 17:43 ilab-landslide-1.0.0.simg
+-rwxr-xr-x 1 iluser  ilab    250040320 Sep  7 18:39 ilab-vnc-1.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   2338299904 Sep  3 17:02 ilab-hyperclass-1.0.6.simg
+-rwxr-xr-x 1 gtamkin k3000   335241216 Aug 20 14:50 ilab-r-3.0.0.simg
+-rwxr-xr-x 1 iluser  ilab    332738560 Aug 19 18:08 ilab-r-2.0.1.simg
+-rwxr-xr-x 1 iluser  ilab    237334528 Aug 13 17:35 ilab-r-3.6.3.simg
+-rwxr-xr-x 1 iluser  ilab   1154277376 Jul 24 15:07 ilab-floodmap-1.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1021177856 Jul  1 14:39 ilab-aviris-3.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1020416000 Jul  1 13:42 ilab-core-5.0.0.simg
+-rwxr-xr-x 1 iluser  ilab    864210944 Jun 16 12:25 cisto-data-science-2.0.0-06152020.simg
+-rwxr-xr-x 1 iluser  ilab   3765039104 Jun 12  2020 ilab-salad-1.1.0.simg
+-rwxr-xr-x 1 iluser  ilab  12020183040 Jun  8  2020 ilab-cb-6.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   3765035008 Jun  8  2020 ilab-salad-1.0.0.simg
+-rwxr-xr-x 1 iluser  ilab  12011393024 Jun  5  2020 ilab-cb-5.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1017065472 May 12  2020 ilab-aviris-2.3.0.simg
+-rwxr-xr-x 1 iluser  ilab   1005064192 May  8  2020 ilab-aviris-2.2.0.simg
+-rwxr-xr-x 1 iluser  ilab    867876864 May  5  2020 cisto-data-science-2.0.0.simg
+-rwxr-xr-x 1 iluser  ilab    994873344 May  5  2020 ilab-aviris-2.0.0.simg
+-rwxr-xr-x 1 iluser  ilab    994127872 May  5  2020 ilab-core-3.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1437360128 May  5  2020 ilab-apps-1.0.0.simg
+-rwxr-xr-x 1 gtamkin k3000  4065329152 May  1  2020 ilab-otb-gpu-1.0.0.simg
+-rwxrwxr-x 1 gtamkin k3000   994058240 May  1  2020 ilab-core-2.0.0.simg
+-rwxrwxr-x 1 gtamkin k3000   994803712 May  1  2020 ilab-aviris-1.0.0.simg
+-rwxr-xr-x 1 iluser  ilab   1003683840 Apr 30  2020 ilab-core-1.0.0.simg
+
+
+The syntax to run a container takes the general form of:  singularity run <<container path>> <<command>>.  For example:
+
+gtamkin@dsg103:~$ singularity run /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg ogrinfo --formats | grep GDB
+WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
+  OpenFileGDB -vector- (rov): ESRI FileGDB
+  FileGDB -vector- (rw+): ESRI FileGDB
+
+The syntax to run a shell in a container takes the general form of:  singularity shell <<container path>>.  For example:
+
+WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
+Singularity> ogrinfo --formats | grep GDB
+  OpenFileGDB -vector- (rov): ESRI FileGDB
+  FileGDB -vector- (rw+): ESRI FileGDB
+Singularity> ls
+JupyterLinks  R  Untitled.ipynb  bin  slurm-9291.out  slurm-9359.out  slurm-9371.out  temp.txt
+
+
 
 
 
