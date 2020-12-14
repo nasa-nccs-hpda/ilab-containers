@@ -2,8 +2,9 @@
 Repo for all containers (refactored from application-specific repositories)
 
 
-| Left-Aligned  | Center Aligned  | Right Aligned |
-| :------------ |:---------------:| -----:|
-| col 3 is      | some wordy text | $1600 |
-| col 2 is      | centered        |   $12 |
+| Name  | Description  | Parent |
+| :------------ |:---------------|:-----|
+| cisto-data-science-<X>      | general purpose python data science ecosystem | openjdk:8-jdk-stretch |
+| ilab-core-<X>      | Innovation Lab common dependencies [Celery, GDAL, etc] | cisto-data-science-<X> |
+| cisto-jupyter-lab-<X>      | general purpose jupyter lab host         |   $12 |
 | zebra stripes | are neat        |    $1 |
