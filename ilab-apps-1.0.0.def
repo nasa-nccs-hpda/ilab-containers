@@ -1,1 +1,63 @@
-/home/centos/projects/ilab/src/innovation-lab/projects/container/singularity/ilab-apps-1.0.0.def
+## Generate ilab suite of container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-core-1.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+
+%environment
+    # set PYTHONPATH for access to MMX application
+    export PYTHONPATH="/usr/local/mmx/projects/ilab/src/innovation-lab:$PYTHONPATH"
+
+%files 
+    # Insert mmx dependencies - TBD - replace with Git retrieval for ilab source branch
+    /att/gpfsfs/briskfs01/ppl/iluser/projects/ilab /usr/local/mmx/projects/ilab
+    /att/gpfsfs/briskfs01/ppl/iluser/ext /usr/local/mmx/ext
+
+%post
+
+    # open permissions
+    chmod a+rwx -R /usr/local/mmx
+
+##############################
+# mmx
+##############################
+
+%apprun mmx
+    exec echo 'RUNNING mmx - python3.7  -f "/usr/local/mmx/projects/ilab/input/ebd_Cassins_2006.csv" -i "/usr/local/mmx/projects/ilab/input" -o "/usr/local/mmx/projects/ilab/output" -s "Cassins Sparrow" -sd "2006-01-01" -ed "2007-01-01" -c "merra2_t1nxslv" -v "U10M V10M" -op "ave" -ewc "True" -t "2" -p "3" -w "Rm" -m "/usr/local/mmx/ext/libraries/maxent.jar"'
+    python3.7  /usr/local/mmx/ilab/src/innovation-lab/view/MmxRequestCommandLineView.py -f "/usr/local/mmx/projects/ilab/input/ebd_Cassins_2006.csv" -i "/usr/local/mmx/projects/ilab/input" -o "/usr/local/mmx/projects/ilab/output" -s "Cassins Sparrow" -sd "2006-01-01" -ed "2007-01-01" -c "merra2_t1nxslv" -v "U10M V10M" -op "ave" -ewc "True" -t "2" -p "3" -w "Rm" -m "/usr/local/mmx/ext/libraries/maxent.jar"
+
+%applabels mmx 
+    Author gtamkin
+    Version v1.0.0
+
+%appinstall mmx 
+    # open permissions
+    # /att/nobackup/gtamkin/mmx-singularity/mmx/SystemTesting /usr/local/mmx
+    # chmod a+rwx -R /usr/local/mmx 
+
+%appenv mmx 
+    # set JAVA_HOME
+    export JAVA_HOME=/usr/local/openjdk-8/bin
+
+%apphelp mmx
+===========================================================================
+	- ilab-mmx (extends -> ilab-core) – contains MMX:
+    		To run:  $ python3.7  /usr/local/mmx/innovation-lab/view/tests/MmxRequestCeleryView-adapt-gpfsfs.py
+===========================================================================
+
+#%appfiles mmx
+    # Insert mmx dependencies
+    #/att/nobackup/gtamkin/mmx-singularity/mmx/SystemTesting /usr/local/mmx
+
+

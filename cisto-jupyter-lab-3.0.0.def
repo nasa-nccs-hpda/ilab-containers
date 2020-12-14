@@ -1,1 +1,71 @@
-/home/centos/newIL/core/container/singularity/cisto-jupyter-lab-3.0.0.def
+## Generate Jupyter container image using existing ilab applications suite
+Bootstrap: localimage
+FROM: ./cisto-jupyter-lab-2.0.0.simg
+#FROM: ./ilab-apps-1.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	jupyter-lab (extends any of the above) – contains notebook conveniences:
+		a.	Jupyter lab
+		b.	Firefox
+===========================================================================
+%files
+    # https://nodejs.org/en/download/
+    node-v14.15.1-linux-x64.tar.xz /opt
+
+%environment
+    export PYTHONPATH="$PYTHONPATH:/usr/local/ee-runner"
+    export PATH="$PATH:/opt/node-v14.15.1-linux-x64/bin"
+
+%startscript
+
+%post
+    # https://developers.google.com/earth-engine/guides/npm_install
+    cd /opt
+    git clone https://github.com/nodejs/node.git
+    cd node
+    git checkout v15.3.0
+    ./configure
+    make
+    make install
+    node -v
+    curl -L https://npmjs.org/install.sh | sudo sh
+    npm -v
+
+    # Install Javascript Node & Package Manager (npm) binaries
+    cd /opt
+    tar xvf node-v14.15.1-linux-x64.tar.xz
+    cd node-v14.15.1-linux-x64/bin
+    ls -alt .
+#    /usr/bin/which node
+    ./node -v
+    pwd
+#    ls -alt .
+#    /usr/bin/which npm
+#    npm install -g ee-runner@latest
+
+    # Install Javascript Node Package Manager (npm)
+#    apt-get update
+#    apt-get install -y nodejs
+##    apt-get install -y npm
+#    nodejs -v
+##    node -v
+    curl -L https://npmjs.org/install.sh | sudo sh
+##    npm -v
+
+    # Install Google Earth Engine API
+    mkdir -p /usr/local/ee-api
+    git clone https://github.com/google/earthengine-api.git /usr/local/ee-api
+    chmod a+rwx -R /usr/local/ee-api
+
+    # Install ee runner to run javascript from command line
+    #  https://github.com/gee-community/ee-runner
+    mkdir -p /usr/local/ee-runner
+    git clone https://github.com/gee-community/ee-runner.git /usr/local/ee-runner
+    chmod a+rwx -R /usr/local/ee-runner
+##    cd /usr/local/ee-runner
+##    npm run init

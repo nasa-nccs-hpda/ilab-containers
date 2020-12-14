@@ -1,1 +1,27 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-5.0.0.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-cb-4.0.3.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%post
+
+    # retrieve customized innovation lab config files
+    mkdir -p /usr/local/il3
+	git clone --single-branch --branch MmxRequestCeleryView https://github.com/nasa-nccs-hpda/innovation-lab.git /usr/local/il3
+
+    # install extended JAVA options for SeaDAS reprojection
+	cp /usr/local/il3/projects/container/obdaac_download.py /usr/local/seadas-7.5.3/bin
+    chmod a+rx /usr/local/seadas-7.5.3/bin/obdaac_download.py
+
+

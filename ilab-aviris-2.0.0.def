@@ -1,1 +1,35 @@
-/home/centos/projects/aviris/src/innovation-lab/projects/container/singularity/ilab-aviris-2.0.0.def
+## Generate AVIRIS container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-core-3.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+
+%environment
+    # set PYTHONPATH for access to AVIRIS application
+    export PYTHONPATH="/usr/local/aviris:/usr/local/aviris/projects/aviris_regression_algorithms"
+
+%post
+
+    # retrieve AVIRIS source from git repository and open permissions
+    mkdir -p /usr/local/aviris
+    git clone --single-branch --branch aviris-celery https://github.com/nasa-nccs-hpda/innovation-lab.git /usr/local/aviris
+    chmod a+rwx -R /usr/local/aviris
+
+##############################
+# aviris
+##############################
+
+%apprun aviris
+     python /usr/local/aviris/projects/aviris_regression_algorithms/view/AvirisCommandLineView.py -c /home/centos/projects/aviris/input/PLSR_Coeff_NoVN_v2.csv -a AVG-CHL -i /home/centos/projects/aviris/input/ang20180729t210144_corr_v2r2_img -o /home/centos/projects/aviris/output
+

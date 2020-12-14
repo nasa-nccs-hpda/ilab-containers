@@ -1,1 +1,42 @@
-/home/centos/newIL/core/container/singularity/cisto-jupyter-lab-2.0.0.def
+## Generate Jupyter container image using existing ilab applications suite
+Bootstrap: localimage
+FROM: ./cisto-data-science-3.0.0.simg
+#FROM: ./ilab-apps-1.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	jupyter-lab (extends any of the above) – contains notebook conveniences:
+		a.	Jupyter lab
+		b.	Firefox
+===========================================================================
+
+%environment
+    JUP_PORT=8888
+    JUP_IPNAME=localhost
+    export JUP_PORT JUP_IPNAME
+
+%startscript
+    PORT=""
+    if [ -n "$JUP_PORT" ]; then PORT="--port=${JUP_PORT}" fi
+    IPNAME=""
+    if [ -n "$JUP_IPNAME" ]; then
+    IPNAME="--ip=${JUP_IPNAME}" fi
+    exec jupyter lab --allow-root ${PORT} ${IPNAME}
+    #exec jupyter notebook --allow-root ${PORT} ${IPNAME}
+
+%post
+    # install Firefox
+    apt-get update
+    apt-get install -y firefox-esr
+
+    # install JupyterLab
+    python3.7 -m pip install --upgrade jupyterlab
+    #python3.7 -m pip install --upgrade jupyterlab==1.2.6
+
+    # install JupyterLab
+    python3.7 -m pip install earthengine-api --upgrade
+

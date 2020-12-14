@@ -1,1 +1,46 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-6.0.1-sandbox.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-cb-6.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%post
+
+    chmod a+rx -R /usr/local/cb
+
+%environment
+    # declare environment vars explicitly relative to container root - 'source OCSSW_bash.env' won't work with Singularity bash script
+    export OCTS_REGISTRATION_TABLES=./usr/local/cb/ocssw/share/octs/nav
+    export SWTBL=./usr/local/cb/ocssw/share/seawifs
+    export LIB3_BIN=./usr/local/cb/ocssw/opt/bin
+    export LIB3_DIR=./usr/local/cb/ocssw/opt
+    export OCSSW_BIN=./usr/local/cb/ocssw/bin
+    export HRPT_STATION_IDENTIFICATION_FILE=./usr/local/cb/ocssw/share/seawifs/station/station_id.dat
+    export PROJ_LIB=./usr/local/cb/ocssw/opt/share/proj
+    export LIB3_INC=./usr/local/cb/ocssw/opt/include
+    export SWFTBL=./usr/local/cb/ocssw/share/seawifs/qc
+    export NAVQC=./usr/local/cb/ocssw/share/seawifs/nav
+    export L2GEN_ANC=./usr/local/cb/ocssw/var/anc
+    export PGSINC=./usr/local/cb/ocssw/opt/EOS/include
+    export PGSLIB=./usr/local/cb/ocssw/opt/EOS/lib/linux64
+    export OCDATAROOT=./usr/local/cb/ocssw/share
+    export ORBCTL=./usr/local/cb/ocssw/share/seawifs/nav
+    export LIB3_LIB=./usr/local/cb/ocssw/opt/lib
+    export PYTHONPATH=./usr/local/cb/ocssw/scripts/modules::./usr/local/cb:./usr/local/cb/ocssw:./usr/local/cb/ocssw/scripts:$PYTHONPATH
+    export OCVARROOT=./usr/local/cb/ocssw/var
+    export NAVCTL=./usr/local/cb/ocssw/share/seawifs/nav
+    export HDFEOS_LIB=./usr/local/cb/ocssw/opt/EOS/lib/linux64
+    export PATH=./usr/local/cb/ocssw/opt/bin:./usr/local/cb:./usr/local/cb/ocssw/bin:./usr/local/openjdk-8/bin:./usr/local/openjdk-8/bin:./usr/local/sbin:./usr/local/bin:./usr/sbin:./usr/bin:/sbin:/bin:./usr/local/cb:./usr/local/cb/ocssw:./usr/local/cb/ocssw/scripts:./usr/local/seadas-7.5.3/bin:/tmp:$PATH
+    export OCSSWROOT=./usr/local/cb/ocssw
+    export ELEMENTS=./usr/local/cb/ocssw/var/seawifs
+    export SAP_PARMS=./usr/local/cb/ocssw/share/common/nav

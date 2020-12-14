@@ -1,1 +1,43 @@
-/home/centos/newIL/core/container/singularity/cisto-conda-1.0.0.def
+Bootstrap: library
+From: ubuntu:18.04
+Stage: build
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- cisto-conda – contains generic Ubuntu-based conda host
+		a. Ubuntu
+		b. Anaconda
+===========================================================================
+
+%post
+
+    # Install Conda dependencies
+    apt-get update && apt-get -y upgrade
+    apt-get -y install \
+    build-essential \
+    wget \
+    bzip2 \
+    ca-certificates \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    git
+    rm -rf /var/lib/apt/lists/*
+    apt-get clean
+
+    # Install Anaconda 3
+    wget -c https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
+    /bin/bash Anaconda3-2020.02-Linux-x86_64.sh -bfp /usr/local
+
+    # Configure Conda channels from .condarc file
+    conda config --file /.condarc --add channels defaults
+    conda config --file /.condarc --add channels conda-forge
+    conda update conda
+
+    # List installed environments
+    conda list

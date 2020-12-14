@@ -1,1 +1,39 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-3.0.0.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+#FROM: ./ilab-core-4.1.0.simg
+FROM: ./ilab-cb-2.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%files
+
+#    ./opt/bda_unix_1_4_1.sh /usr/local/cb/opt
+    bda_unix_1_4_1.sh
+
+%environment
+    # set PYTHONPATH for access to CB application
+#    export INSTALL4J_JAVA_HOME=/usr/local/openjdk-8/bin:/usr/local/openjdk-8
+
+%post
+    export JAVA_HOME=/usr/local/openjdk-8/bin
+    export JAVA_VERSION=8u242
+    export JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_
+    export JAVA_URL_VERSION=8u242b08
+    export PATH=/usr/local/openjdk-8/bin:$PATH
+
+    chmod a+rwx bda_unix_1_4_1.sh
+    sh bda_unix_1_4_1.sh -q
+#    chmod a+rwx /usr/local/cb/opt/bda_unix_1_4_1.sh
+#    sh /usr/local/cb/opt/bda_unix_1_4_1.sh
+
+

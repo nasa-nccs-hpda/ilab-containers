@@ -1,1 +1,28 @@
-/home/centos/newIL/core/container/singularity/ilab-gee-1.0.0.def
+## Generate core container with ilab-specific dependencies that builds on the Python ecosystem container
+Bootstrap: localimage
+FROM: ./ilab-core-6.0.0.simg
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-core (extends -> python3-data-science) – contains GIS & ilab dependencies:
+		a.	GDAL
+		b.	Celery
+		c.  Redis (Celery server)
+===========================================================================
+
+%environment
+    # set PYTHONPATH for access to ILProcessController
+    export PYTHONPATH="$PYTHONPATH:/usr/local/earth-engine-api/python"
+
+%post
+
+    # install Google Earth Engine (GEE)
+    pip install earthengine-api --upgrade
+
+    # retrieve GEE python & examples
+    mkdir -p /usr/local/earth-engine-api
+    git clone https://github.com/google/earthengine-api.git /usr/local/earth-engine-api
+    chmod a+rwx -R /usr/local/earth-engine-api

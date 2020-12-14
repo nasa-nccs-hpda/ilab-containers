@@ -1,1 +1,22 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-6.0.0.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-cb-5.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%post
+
+    # install ncdump
+    python -m pip install --upgrade netCDF4==1.5.3
+
+

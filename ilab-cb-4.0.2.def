@@ -1,1 +1,47 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-4.0.2.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-cb-4.0.1.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%environment
+#    export INSTALL4J_JAVA_HOME=/usr/local/openjdk-8/bin:/usr/local/openjdk-8
+#    export JAVA_HOME=/usr/local/openjdk-8/bin
+#    export JAVA_VERSION=8u242
+#    export JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_
+#    export JAVA_URL_VERSION=8u242b08
+
+%post
+#    /usr/local/openjdk-8/bin/java -version
+#    export INSTALL4J_JAVA_HOME=/usr/local/openjdk-8/bin:/usr/local/openjdk-8
+#    export JAVA_HOME=/usr/local/openjdk-8/bin
+#    export JAVA_VERSION=8u242
+#    export JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_
+#    export JAVA_URL_VERSION=8u242b08
+
+    # retrieve customized innovation lab config files
+    mkdir -p /usr/local/il
+	git clone --single-branch --branch MmxRequestCeleryView https://github.com/nasa-nccs-hpda/innovation-lab.git /usr/local/il
+
+    # install extended JAVA options for SeaDAS
+	cp /usr/local/il/projects/container/seadas.vmoptions /usr/local/seadas-7.5.3/bin
+    chmod a+r /usr/local/seadas-7.5.3/bin/seadas.vmoptions
+
+    # install bulk data download (https://earthexplorer.usgs.gov/bulk/)
+#    mkdir -p /usr/local/bda
+#	cp /usr/local/il/projects/container/bda_unix_1_4_1.sh /usr/local/bda
+#	chmod a+rwx /usr/local/bda/bda_unix_1_4_1.sh
+#    sh /usr/local/bda/bda_unix_1_4_1.sh -q -dir /usr/local/bda
+#    chmod a+rwx -R /usr/local/bda/bda
+
+

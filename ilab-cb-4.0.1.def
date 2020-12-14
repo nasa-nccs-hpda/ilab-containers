@@ -1,1 +1,92 @@
-/home/centos/cb/cb/container/singularity/ilab-cb-4.0.1.def
+ ## Generate CB container image applications using the existing ilab core image
+Bootstrap: localimage
+FROM: ./ilab-core-4.1.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-apps (extends -> ilab-infrastructure) – contains shared IL code and IL apps:
+		a.	Model
+		b.	View
+		c.	Controller
+		d.	Projects
+===========================================================================
+%files
+    bda_unix_1_4_1.sh
+
+%environment
+    # set PYTHONPATH for access to CB application
+    export INSTALL4J_JAVA_HOME=/usr/local/openjdk-8/bin:/usr/local/openjdk-8
+    export JAVA_HOME=/usr/local/openjdk-8/bin:/usr/local/openjdk-8
+    export PATH=/usr/local/cb:/usr/local/cb/ocssw/bin:/usr/local/openjdk-8/bin:$PATH
+
+    export JAVA_HOME=/usr/local/openjdk-8/bin
+    export JAVA_VERSION=8u242
+    export JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_
+    export JAVA_URL_VERSION=8u242b08
+
+    export PYTHONPATH="$PYTHONPATH:/usr/local/cb:/usr/local/cb/ocssw:/usr/local/cb/ocssw/scripts"
+    export PATH="$PATH:/usr/local/cb:/usr/local/cb/ocssw:/usr/local/cb/ocssw/scripts:/usr/local/seadas-7.5.3/bin:/tmp"
+
+    # declare environment vars explicitly - 'source OCSSW_bash.env' won't work with Singularity bash script
+    export OCTS_REGISTRATION_TABLES=/usr/local/cb/ocssw/share/octs/nav
+    export SWTBL=/usr/local/cb/ocssw/share/seawifs
+    export LIB3_BIN=/usr/local/cb/ocssw/opt/bin
+    export LIB3_DIR=/usr/local/cb/ocssw/opt
+    export OCSSW_BIN=/usr/local/cb/ocssw/bin
+    export HRPT_STATION_IDENTIFICATION_FILE=/usr/local/cb/ocssw/share/seawifs/station/station_id.dat
+    export PROJ_LIB=/usr/local/cb/ocssw/opt/share/proj
+    export LIB3_INC=/usr/local/cb/ocssw/opt/include
+    export SWFTBL=/usr/local/cb/ocssw/share/seawifs/qc
+    export NAVQC=/usr/local/cb/ocssw/share/seawifs/nav
+    export L2GEN_ANC=/usr/local/cb/ocssw/var/anc
+    export PGSINC=/usr/local/cb/ocssw/opt/EOS/include
+    export PGSLIB=/usr/local/cb/ocssw/opt/EOS/lib/linux64
+    export OCDATAROOT=/usr/local/cb/ocssw/share
+    export ORBCTL=/usr/local/cb/ocssw/share/seawifs/nav
+    export LIB3_LIB=/usr/local/cb/ocssw/opt/lib
+    export PYTHONPATH=/usr/local/cb/ocssw/scripts/modules::/usr/local/cb:/usr/local/cb/ocssw:/usr/local/cb/ocssw/scripts:$PYTHONPATH
+    export OCVARROOT=/usr/local/cb/ocssw/var
+    export NAVCTL=/usr/local/cb/ocssw/share/seawifs/nav
+    export HDFEOS_LIB=/usr/local/cb/ocssw/opt/EOS/lib/linux64
+    export PATH=/usr/local/cb/ocssw/opt/bin:/usr/local/cb:/usr/local/cb/ocssw/bin:/usr/local/openjdk-8/bin:/usr/local/openjdk-8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/cb:/usr/local/cb/ocssw:/usr/local/cb/ocssw/scripts:/usr/local/seadas-7.5.3/bin:/tmp:$PATH
+    export OCSSWROOT=/usr/local/cb/ocssw
+    export ELEMENTS=/usr/local/cb/ocssw/var/seawifs
+    export SAP_PARMS=/usr/local/cb/ocssw/share/common/nav
+
+%post
+    /usr/local/openjdk-8/bin/java -version
+    export JAVA_HOME=/usr/local/openjdk-8/bin
+    export JAVA_VERSION=8u242
+    export JAVA_BASE_URL=https://github.com/AdoptOpenJDK/openjdk8-upstream-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_
+    export JAVA_URL_VERSION=8u242b08
+    export PATH=/usr/local/openjdk-8/bin:$PATH
+    export OCSSWROOT=/usr/local/cb/ocssw
+
+    # install bulk data download (https://earthexplorer.usgs.gov/bulk/)
+    chmod a+rwx bda_unix_1_4_1.sh
+    sh bda_unix_1_4_1.sh -q -dir /tmp
+    chmod a+rwx -R /tmp/bda
+
+    # retrieve CB source from git repository and open permissions
+    mkdir -p /usr/local/cb
+    wget https://oceandata.sci.gsfc.nasa.gov/SeaDAS/installer/7.5.3/seadas_7.5.3_linux64_installer.sh
+    sh seadas_7.5.3_linux64_installer.sh -q
+
+    wget https://oceandata.sci.gsfc.nasa.gov/ocssw/install_ocssw.py
+    chmod a+rwx ./install_ocssw.py
+    ./install_ocssw.py --install-dir=/usr/local/cb/ocssw --oli --msis2a --msis2b --olcis3a --olcis3b --aqua --terra --viirsn --viirsj1
+    chmod a+rwx -R /usr/local/cb
+
+##############################
+# cb
+##############################
+
+%apprun cb
+     python /usr/local/cb/projects/cb_regression_algorithms/view/AvirisCommandLineView.py -c /home/centos/projects/cb/input/PLSR_Coeff_NoVN_v2.csv -a AVG-CHL -i /home/centos/projects/cb/input/ang20180729t210144
+_corr_v2r2_img -o /home/centos/projects/cb/output
+
+
