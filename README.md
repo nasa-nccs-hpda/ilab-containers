@@ -37,6 +37,7 @@ Containers are built hiearchically.  For example, the based Python scientific sy
 
 The IL containers can be hosted on any platform with a Singularity client.  For user convenience and centralized management, the containers are available on ADAPT.  To access them, log into dsg103 (or equivalent VM) and navigate to the shared iluser container directory: 
 
+```
 gtamkin@dsg103:~$ cd /att/gpfsfs/briskfs01/ppl/iluser/containers
 gtamkin@dsg103:/att/gpfsfs/briskfs01/ppl/iluser/containers$ ls -alt *.simg
 -rwxr-xr-x 1 iluser  ilab   1089593344 Dec 10 21:08 cisto-centos-gdal-2.0.0.simg
@@ -71,23 +72,36 @@ gtamkin@dsg103:/att/gpfsfs/briskfs01/ppl/iluser/containers$ ls -alt *.simg
 -rwxrwxr-x 1 gtamkin k3000   994058240 May  1  2020 ilab-core-2.0.0.simg
 -rwxrwxr-x 1 gtamkin k3000   994803712 May  1  2020 ilab-aviris-1.0.0.simg
 -rwxr-xr-x 1 iluser  ilab   1003683840 Apr 30  2020 ilab-core-1.0.0.simg
+```
 
+## Execute a Container
 
-The syntax to run a container takes the general form of:  singularity run <<container path>> <<command>>.  For example:
+The syntax to run a container takes the general form of:  
 
-gtamkin@dsg103:~$ singularity run /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg ogrinfo --formats | grep GDB
+$ singularity run *container-path* *command*.  For example:
+
+```
+gtamkin@dsg103:~$ **singularity run /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg *ogrinfo --formats | grep GDB* **
 WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
   OpenFileGDB -vector- (rov): ESRI FileGDB
   FileGDB -vector- (rw+): ESRI FileGDB
+```
 
-The syntax to run a shell in a container takes the general form of:  singularity shell <<container path>>.  For example:
+## Shell into a Container
 
+The syntax to run a shell in a container takes the general form of:  
+
+$ singularity shell *container-path*.  For example:
+
+```
+gtamkin@dsg103:~$ **singularity shell /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg** 
 WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
-Singularity> ogrinfo --formats | grep GDB
+Singularity> *ogrinfo --formats | grep GDB*
   OpenFileGDB -vector- (rov): ESRI FileGDB
   FileGDB -vector- (rw+): ESRI FileGDB
-Singularity> ls
+Singularity> *ls*
 JupyterLinks  R  Untitled.ipynb  bin  slurm-9291.out  slurm-9359.out  slurm-9371.out  temp.txt
+```
 
 
 
