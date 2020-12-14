@@ -1,5 +1,5 @@
 # Container Repository Overview
-This repository hosts all container recipe files (refactored from application-specific repositories) built by the Innovation Lab (IL) development team.  Primarly, two types of containers exist:  1) General-purpose, and 2) Application-specific.  General-puropse containers contain reusable functionality for multiple applications.  Application-specific containers host unique software and configuration artifacts for a specific use.  The application-specific containers incorporate and extend the core general-purpose containers.
+This repository hosts all container recipe files (refactored from application-specific repositories) built by the Innovation Lab (IL) development team.  Primarly, two types of containers exist:  1) General-purpose, and 2) Application-specific.  General-puropse containers contain reusable functionality for multiple applications.  Application-specific containers host unique software and configuration artifacts for a specific use.  Typically, they incorporate and extend the core general-purpose containers.
 
 # Container Technology
 IL recipes are written for deployment to Singularity frameworks (as required by CISTO/NCCS). Each recipe is used when building the corresponding container image using syntax of the general form:  
@@ -10,7 +10,7 @@ $ singularity build *target container name* *container recipe*.  For example:
 $ /usr/bin/sudo /usr/local/bin/singularity build ilab-core-2.0.0.simg ilab-core-2.0.0.def 
 ```
 
-Containers are built hiearchically.  For example, the based Python scientific system container is the parent of the IL core container.  This approach allows for managing specific software dependencies and versions per container while giving the target image flexibility for extended application-specific features.
+Containers are built hierarchically.  For example, the base Python scientific system container is the parent of the IL core container.  This approach allows for managing specific software dependencies and versions per container while giving the target image flexibility for extended application-specific features.
 
 
 # Container Inventory (alphabetical order)
