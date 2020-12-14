@@ -2,12 +2,15 @@
 This repository hosts all container recipe files (refactored from application-specific repositories) built by the Innovation Lab (IL) development team.  Primarly, two types of containers exist:  1) General-purpose, and 2) Application-specific.  General-puropse containers contain reusable functionality for multiple applications.  Application-specific containers host unique software and configuration artifacts for a specific use.  The application-specific containers incorporate and extend the core general-purpose containers.
 
 # Container Technology
-IL recipes are written for deployment to Singularity frameworks (as required by CISTO/NCCS). Each recipe is used when building the corresponding container image using syntax of the general form:  $ singularity build 'target container name' 'container recipe'
+IL recipes are written for deployment to Singularity frameworks (as required by CISTO/NCCS). Each recipe is used when building the corresponding container image using syntax of the general form:  
 
-Example (ADAPT):
+$ singularity build *target container name* *container recipe*.  For example:
+
+'''
 $ time /usr/bin/sudo -E SINGULARITY_NOHTTPS=1 /usr/local/bin/singularity build ilab-core-2.0.0.simg ilab-core-2.0.0.def 
+'''
 
-Containers are built hiearchically.  For example, the based Python scientific system container is the parent of the IL core container.  This approach allows for managing specific software dependencies and versions per container while giving the target image flexibility for extended appliccation-specific features.
+Containers are built hiearchically.  For example, the based Python scientific system container is the parent of the IL core container.  This approach allows for managing specific software dependencies and versions per container while giving the target image flexibility for extended application-specific features.
 
 
 # Container Inventory (alphabetical order)
@@ -81,7 +84,7 @@ The syntax to run a container takes the general form of:
 $ singularity run *container-path* *command*.  For example:
 
 ```
-gtamkin@dsg103:~$ **singularity run /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg *ogrinfo --formats | grep GDB* **
+gtamkin@dsg103:~$ singularity run /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg ogrinfo --formats | grep GDB
 WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
   OpenFileGDB -vector- (rov): ESRI FileGDB
   FileGDB -vector- (rw+): ESRI FileGDB
@@ -94,15 +97,14 @@ The syntax to run a shell in a container takes the general form of:
 $ singularity shell *container-path*.  For example:
 
 ```
-gtamkin@dsg103:~$ **singularity shell /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg** 
+gtamkin@dsg103:~$ singularity shell /att/gpfsfs/briskfs01/ppl/iluser/containers/cisto-centos-gdal-2.0.0.simg 
 WARNING: Bind mount '/home/gtamkin => /home/gtamkin' overlaps container CWD /home/gtamkin, may not be available
-Singularity> *ogrinfo --formats | grep GDB*
+Singularity> ogrinfo --formats | grep GDB
   OpenFileGDB -vector- (rov): ESRI FileGDB
   FileGDB -vector- (rw+): ESRI FileGDB
-Singularity> *ls*
+Singularity> ls
 JupyterLinks  R  Untitled.ipynb  bin  slurm-9291.out  slurm-9359.out  slurm-9371.out  temp.txt
 ```
-
 
 
 
