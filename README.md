@@ -6,9 +6,9 @@ IL recipes are written for deployment to Singularity frameworks (as required by 
 
 $ singularity build *target container name* *container recipe*.  For example:
 
-'''
-$ time /usr/bin/sudo -E SINGULARITY_NOHTTPS=1 /usr/local/bin/singularity build ilab-core-2.0.0.simg ilab-core-2.0.0.def 
-'''
+```
+$ /usr/bin/sudo /usr/local/bin/singularity build ilab-core-2.0.0.simg ilab-core-2.0.0.def 
+```
 
 Containers are built hiearchically.  For example, the based Python scientific system container is the parent of the IL core container.  This approach allows for managing specific software dependencies and versions per container while giving the target image flexibility for extended application-specific features.
 
