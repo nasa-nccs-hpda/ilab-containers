@@ -1,0 +1,164 @@
+#-------------------------------------------------------------------------------
+# dsg10x runs Centos
+#-------------------------------------------------------------------------------
+#FROM centos
+# yum upgrade-minimal
+
+Bootstrap: docker
+FROM: centos
+
+%environment
+	export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib:$LD_LIBRARY_PATH
+
+%post
+
+	yum upgrade-minimal
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#
+# Centos comes with:
+#   bash completion
+#
+# Git added many packages, including:  pip, openSSH
+#-------------------------------------------------------------------------------
+	yum install -y \
+		git \
+		man-pages \
+		man \
+		python3 \
+		sudo \
+		which
+
+#-------------------------------------------------------------------------------
+# GEOS
+#
+# This is broken into sections to isolate troublesome parts and decrease build
+# time.
+#
+# Test:  configure should say "Python bindings: true" at end of its output.
+#        If not, ensure swig is enabled.  If not, ensure it is installed.
+#-------------------------------------------------------------------------------
+export dataStoreDir="/mnt/data-store/"
+
+ yum install -y \
+	bzip2 \
+	diffutils \
+	file \
+	gcc-c++ \
+	make \
+	python3-devel \
+	swig \
+	wget
+	
+ mkdir $dataStoreDir \
+    && cd $dataStoreDir \
+    && wget http://download.osgeo.org/geos/geos-3.8.1.tar.bz2  \
+    && tar -xjf geos-3.8.1.tar.bz2 \
+    && rm geos-3.8.1.tar.bz2
+
+# ---
+# Python appends an "m" to its version internally, but reports its version
+# without it.  This prevents configure from finding Python.h.  To work
+# around this, create a symbolic link.  The same thing happens with
+# libpython3.6m.*.  All that said, the the include is working without the
+# link now.  What changed?  I do not know.
+# ---
+ ln -s /usr/lib64/libpython3.6m.so /usr/lib64/libpython3.6.so \
+	&& ln -s /usr/lib64/libpython3.6m.so.1.0 /usr/lib64/libpython3.6.so.1.0
+
+ cd $dataStoreDir\geos-3.8.1 \
+    && ./configure --enable-python --enable-static --with-pic \
+    && make \
+    && make install
+	
+#-------------------------------------------------------------------------------
+# GDAL
+#
+# Used by: ImageFile and others
+#
+# Test:  "gdalinfo --version" it should be what you expect
+# Test:  "gdalinfo --formats | grep -i hdf" should include HDF4 and HDF5
+# Test:  "ogr2ogr" --formats | grep -i gdb" should include FileGDB
+# Test:  export LD_LIBRARY_PATH=/usr/local/lib, Python shell,
+#        from osgeo import gdal, should produce no error
+#
+# First, add the yum repositories containing proj.
+#-------------------------------------------------------------------------------
+ yum install -y \
+	https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+# Fror some reason, this does not work when combined with the line above.
+ yum install -y proj-devel
+
+# Install netcdf.	
+ yum install -y dnf-plugins-core
+ dnf config-manager --set-enabled powertools
+
+ yum install -y netcdf-devel
+
+# Install FileGDB.
+ cd $dataStoreDir \
+	&&  wget https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5/FileGDB_API_1_5_64gcc51.tar.gz \
+	&& tar -zxf FileGDB_API_1_5_64gcc51.tar.gz \
+	&& rm FileGDB_API_1_5_64gcc51.tar.gz
+
+#-------------------------------------------------------------------------------
+# Fix for ogr2ogr Xerces error.  To test, run:
+#
+# ogr2ogr -f 'GML' --debug on -limit 27 -spat 37.05199030182582 -112.43223503552447 37.96287168537758 \
+#   -110.98202787057997 -sql "select * from nga_inventory_canon where (prod_short='1B')
+#   AND (SENSOR='WV01' OR SENSOR='WV02' OR SENSOR='WV03') AND (ACQ_DATE<'2020-12-14 13:55:03')
+#   order by ACQ_DATE DESC" "/att/nobackup/rlgill/.nccstmp/tmphgm1i9pk"
+#   "/css/nga/INDEX/Footprints/current/newest/geodatabase/nga_inventory_canon.gdb"
+#-------------------------------------------------------------------------------
+  yum install -y xerces-c
+
+# GDAL, finally.
+export gdalVersion=3.2.0
+export gdalName=gdal-$gdalVersion
+
+ cd $dataStoreDir \
+    && wget http://download.osgeo.org/gdal/$gdalVersion/$gdalName.tar.gz \
+    && tar -zxf $gdalName.tar.gz \
+    && rm $gdalName.tar.gz
+	
+ cd $dataStoreDir/$gdalName \
+	&& ./configure LIBTOOL='/usr/bin/libtool --tag=CC' --with-python --enable-static --with-pic -with-geos=yes \
+	    --with-netcdf --with-fgdb=/mnt/data-store/FileGDB_API-64gcc51 --with-expat=/mnt/data-store/FileGDB_API-64gcc51 \
+	&& export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib \
+    && make \
+    && make install
+
+#-------------------------------------------------------------------------------
+# Used by: date_range in MasRequest
+#-------------------------------------------------------------------------------
+ sudo python3 -m pip install setuptools pandas
+
+#-------------------------------------------------------------------------------
+# Java, for maxent.jar
+#-------------------------------------------------------------------------------
+ yum install -y java-1.8.0-openjdk
+
+#-------------------------------------------------------------------------------
+# Celery
+#
+# Used for: distributed processing in request objects
+#-------------------------------------------------------------------------------
+ python3 -m pip install --upgrade pip celery[redis]
+ yum install -y redis telnet
+
+#-------------------------------------------------------------------------------
+# Create a user.
+#-------------------------------------------------------------------------------
+export ilPw=mungeIt
+
+ adduser -p $(openssl passwd -crypt $ilPw) ilUser \
+	&& usermod -aG wheel ilUser
+
+#USER ilUser
+#export homeDir="/home/ilUser"
+# echo "umask 0000" >> ~/.bashrc \
+#	&& echo "export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib" >> #~/.bashrc
+
+
