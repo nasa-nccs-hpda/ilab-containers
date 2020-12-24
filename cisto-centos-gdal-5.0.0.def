@@ -35,6 +35,7 @@ FROM: centos
         swig \
         wget
 
+    python3 -m pip install numpy
 #-------------------------------------------------------------------------------
 # GDAL
 #
@@ -108,16 +109,8 @@ export gdalName=gdal-$gdalVersion
  yum install -y redis telnet
 
 #-------------------------------------------------------------------------------
-# Create a user.
+# Python - symbolic link to python3
 #-------------------------------------------------------------------------------
-export ilPw=mungeIt
-
- adduser -p $(openssl passwd -crypt $ilPw) ilUser \
-	&& usermod -aG wheel ilUser
-
-#USER ilUser
-#export homeDir="/home/ilUser"
-# echo "umask 0000" >> ~/.bashrc \
-#	&& echo "export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib" >> #~/.bashrc
+ ln -sf /usr/bin/python3 /usr/bin/python
 
 
