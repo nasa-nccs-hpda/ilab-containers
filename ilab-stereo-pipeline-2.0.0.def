@@ -1,0 +1,36 @@
+#-------------------------------------------------------------------------------
+# docker build -t stereo-pipeline:1.0 .
+# docker run -it stereo-pipeline:1.0
+#
+# ADAPT supports Debian and Debian uses apt-get.
+#-------------------------------------------------------------------------------
+Bootstrap: docker
+FROM: debian
+
+%environment
+	export PATH=$PATH:/mnt/data-store/StereoPipeline-2.7.0-2020-07-29-x86_64-Linux/bin
+
+%post
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#-------------------------------------------------------------------------------
+apt-get update && apt-get install --fix-missing -y \
+	bzip2 \
+	libx11-dev \
+	python3 \
+    wget
+
+#-------------------------------------------------------------------------------
+# Stereo Pipeline
+#-------------------------------------------------------------------------------
+export dataStoreDir="/mnt/data-store/"
+mkdir $dataStoreDir
+
+cd $dataStoreDir \
+	&& wget https://github.com/NeoGeographyToolkit/StereoPipeline/releases/download/2.7.0/StereoPipeline-2.7.0-2020-07-29-x86_64-Linux.tar.bz2 \
+	&& tar -xf StereoPipeline-2.7.0-2020-07-29-x86_64-Linux.tar.bz2 \
+	&& rm StereoPipeline-2.7.0-2020-07-29-x86_64-Linux.tar.bz2
+
+ln -s /usr/bin/python3 /usr/bin/python
+
