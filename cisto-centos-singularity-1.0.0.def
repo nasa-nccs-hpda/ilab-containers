@@ -1,0 +1,53 @@
+#-------------------------------------------------------------------------------
+# Singularity client:
+# - Build as sandbox to allow user namespaces
+#   $ /usr/local/bin/singularity build --sandbox cisto-centos-singularity-1.0.0-sandbox.sif cisto-centos-singularity-1.0.0.def
+# - Enable kernel support (verify that namespaces > 0)
+#   $ echo 10000 > /proc/sys/user/max_user_namespaces
+#-------------------------------------------------------------------------------
+Bootstrap: docker
+FROM: centos
+
+%post
+
+	yum upgrade-minimal
+    yum install -y sudo
+
+	# Install Singularity:
+    #  https://sylabs.io/guides/3.0/user-guide/installation.html#download-and-install-singularity-from-a-release
+
+    # Singularity dependencies:
+    sudo yum update -y && \
+    sudo yum groupinstall -y 'Development Tools' && \
+    sudo yum install -y \
+    openssl-devel \
+    libuuid-devel \
+    libseccomp-devel \
+    wget \
+    squashfs-tools
+
+    # Install GO compiler (required for Singularity):
+    export VERSION=1.15 OS=linux ARCH=amd64 && \
+    wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
+    sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    rm go$VERSION.$OS-$ARCH.tar.gz
+
+    echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
+    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+    source ~/.bashrc
+
+    /usr/local/go/bin/go get -u github.com/golang/dep/cmd/dep
+
+    # Install Singularity without SUID to support unprivileged namespaces (required for sandbox<->sandbox calls)
+    export VERSION=3.7.0 && # adjust this as necessary \
+    mkdir -p $GOPATH/src/github.com/sylabs && \
+    cd $GOPATH/src/github.com/sylabs && \
+    wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && \
+    tar -xzf singularity-${VERSION}.tar.gz && \
+
+    cd ./singularity && \
+    ./mconfig --without-suid --prefix=/opt/singularity && \
+    make -C ./builddir && \
+    sudo make -C ./builddir install
+
+    ln -sf /opt/singularity/bin/singularity /usr/local/bin/singularity
