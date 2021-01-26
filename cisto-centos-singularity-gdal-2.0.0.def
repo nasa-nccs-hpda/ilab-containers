@@ -1,0 +1,115 @@
+#-------------------------------------------------------------------------------
+# dsg10x runs Centos
+#-------------------------------------------------------------------------------
+Bootstrap: localimage
+FROM: ./cisto-centos-singularity-1.0.0.sif
+
+%environment
+
+%post
+
+	yum upgrade-minimal
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#
+# Centos comes with:
+#   bash completion
+#
+# Git added many packages, including:  pip, openSSH
+#-------------------------------------------------------------------------------
+	yum install -y \
+        git \
+        man-pages \
+        man \
+        python3 \
+        sudo \
+        which \
+        bzip2 \
+        diffutils \
+        file \
+        gcc-c++ \
+        make \
+        python3-devel \
+        swig \
+        wget
+
+    python3 -m pip install numpy
+#-------------------------------------------------------------------------------
+# GDAL
+#
+# Used by: ImageFile and others
+#
+# Test:  "gdalinfo --version" it should be what you expect
+# Test:  "gdalinfo --formats | grep -i hdf" should include HDF4 and HDF5
+# Test:  "ogr2ogr" --formats | grep -i gdb" should include FileGDB
+# Test:  export LD_LIBRARY_PATH=/usr/local/lib, Python shell,
+#        from osgeo import gdal, should produce no error
+#
+# First, add the yum repositories containing proj.
+#-------------------------------------------------------------------------------
+export dataStoreDir="/mnt/data-store/"
+mkdir $dataStoreDir
+
+# Set up repositories in which to find the applications needed.
+yum install -y \
+	https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+yum install -y dnf-plugins-core
+dnf config-manager --set-enabled powertools
+
+yum install -y geos \
+	geos-devel \
+	proj-devel \
+	netcdf-devel \
+	expat-devel
+
+# Install FileGDB.
+cd $dataStoreDir \
+	&&  wget https://github.com/Esri/file-geodatabase-api/raw/master/FileGDB_API_1.5/FileGDB_API_1_5_64gcc51.tar.gz \
+	&& tar -zxf FileGDB_API_1_5_64gcc51.tar.gz \
+	&& rm FileGDB_API_1_5_64gcc51.tar.gz
+
+# JPEG 2000 dependencies
+yum install -y jasper-devel \
+	&& yum install -y openjpeg2-devel
+
+# GDAL, finally.
+export gdalVersion=3.2.0
+export gdalName=gdal-$gdalVersion
+
+ cd $dataStoreDir \
+    && wget http://download.osgeo.org/gdal/$gdalVersion/$gdalName.tar.gz \
+    && tar -zxf $gdalName.tar.gz \
+    && rm $gdalName.tar.gz
+
+ cd $dataStoreDir/$gdalName \
+	&& ./configure LIBTOOL='/usr/bin/libtool --tag=CC' --with-python --with-pic --with-geos=yes --with-netcdf --with-jpeg --with-jasper --with-openjpeg \
+	&& export LD_LIBRARY_PATH=/usr/local/lib \
+    && make \
+    && make install
+
+#-------------------------------------------------------------------------------
+# Used by: date_range in MasRequest
+#-------------------------------------------------------------------------------
+ sudo python3 -m pip install setuptools pandas
+
+#-------------------------------------------------------------------------------
+# Java, for maxent.jar
+#-------------------------------------------------------------------------------
+ yum install -y java-1.8.0-openjdk
+
+#-------------------------------------------------------------------------------
+# Celery
+#
+# Used for: distributed processing in request objects
+#-------------------------------------------------------------------------------
+ python3 -m pip install --upgrade pip celery[redis]
+ yum install -y redis telnet
+
+#-------------------------------------------------------------------------------
+# Python - symbolic link to python3
+#-------------------------------------------------------------------------------
+ ln -sf /usr/bin/python3 /usr/bin/python
+
+

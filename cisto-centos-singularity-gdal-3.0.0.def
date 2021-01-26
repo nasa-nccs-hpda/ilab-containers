@@ -1,0 +1,8 @@
+#-------------------------------------------------------------------------------
+# dsg10x runs Centos
+#-------------------------------------------------------------------------------
+Bootstrap: localimage
+FROM: ./cisto-centos-singularity-gdal-2.0.0.sif
+
+%environment
+    export LD_LIBRARY_PATH=/mnt/data-store/FileGDB_API-64gcc51/lib/:/usr/local/lib:$LD_LIBRARY_PATH

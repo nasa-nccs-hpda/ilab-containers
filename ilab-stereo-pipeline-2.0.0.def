@@ -19,6 +19,7 @@ apt-get update && apt-get install --fix-missing -y \
 	bzip2 \
 	libx11-dev \
 	python3 \
+    libxext \
     wget
 
 #-------------------------------------------------------------------------------
