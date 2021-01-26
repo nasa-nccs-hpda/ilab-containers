@@ -1,0 +1,16 @@
+#-------------------------------------------------------------------------------
+# dsg10x runs Centos
+#-------------------------------------------------------------------------------
+Bootstrap: localimage
+FROM: ./cisto-centos-gdal-5.0.0.simg
+
+%files
+
+%environment
+
+%post
+
+    sudo yum update -y && \
+    sudo yum install -y epel-release && \
+    sudo yum update -y && \
+    sudo yum install -y singularity

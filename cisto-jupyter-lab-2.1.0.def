@@ -1,0 +1,28 @@
+## Generate Jupyter container image using existing ilab applications suite
+Bootstrap: localimage
+FROM: ./cisto-jupyter-lab-2.0.0.simg
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	jupyter-lab (extends any of the above) – contains notebook conveniences:
+		a.	Jupyter lab
+		b.	Firefox
+===========================================================================
+
+%environment
+    export PATH="$PATH:/usr/local/ee-runner:/google-cloud-sdk/bin"
+
+%post
+
+    curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-321.0.0-linux-x86_64.tar.gz
+    tar xzf google-cloud-sdk-321.0.0-linux-x86_64.tar.gz
+    ./google-cloud-sdk/install.sh
+#    ./google-cloud-sdk/bin/gcloud init --skip-diagnostics
+
+
+
+
