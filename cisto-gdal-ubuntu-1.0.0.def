@@ -1,0 +1,47 @@
+#-------------------------------------------------------------------------------
+# Singularity client:
+# - Build as sandbox to allow user namespaces
+#   $ /usr/local/bin/singularity build --sandbox cisto-centos-singularity-1.0.0-sandbox.sif cisto-centos-singularity-1.0.0.def
+# - Enable kernel support (verify that namespaces > 0)
+#   $ echo 10000 > /proc/sys/user/max_user_namespaces
+#-------------------------------------------------------------------------------
+Bootstrap: docker
+FROM: osgeo/gdal:ubuntu-full-latest
+
+%test
+
+    echo 'System Information:'
+    uname -a
+
+    echo 'Linux Version:'
+    cat /etc/os-release
+
+    echo 'gdalinfo --formats | grep -i jpeg'
+    gdalinfo --formats | grep -i jpeg
+
+    echo 'gdalinfo --formats | grep -i hdf'
+    gdalinfo --formats | grep -i hdf
+
+    echo 'ogrinfo --formats | grep GDB'
+    ogrinfo --formats | grep GDB
+
+    echo 'Python version:'
+    python -V
+
+    echo 'GDAL version:'
+    python -c 'from osgeo import gdal; print(gdal.__version__)'
+
+    echo 'Java version:'
+    java --version
+
+%post
+
+    # Print System Information
+    uname -a
+    cat /etc/os-release
+    gdalinfo --formats | grep -i jpeg
+    gdalinfo --formats | grep -i hdf
+    ogrinfo --formats | grep GDB
+    python -V
+    python -c 'from osgeo import gdal; print(gdal.__version__)'
+    java --version

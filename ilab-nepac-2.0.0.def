@@ -1,0 +1,19 @@
+## Generate NEPAC container
+Bootstrap: localimage
+FROM: ./ilab-core-7.0.0.sif
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-core (extends -> ilab-core) – contains NEPAC dependencies:
+		a.	xarray
+===========================================================================
+
+%post
+
+    #pip install NEPAC dependencies
+    pip install --upgrade xarray==0.16.2
+    pip install --upgrade netcdf4==1.5.4
