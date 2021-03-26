@@ -1,0 +1,24 @@
+## Generate CFM container
+Bootstrap: localimage
+FROM: ./ilab-core-7.0.0.sif
+
+%labels
+    Author gtamkin/jli
+    Version v1.0.0
+
+%help
+===========================================================================
+	- ilab-core (extends -> ilab-core) – contains CFM dependencies:
+		a.	xarray
+===========================================================================
+
+%post
+
+    #pip install CFM dependencies
+    pip install --upgrade xarray==0.16.2
+    pip install --upgrade netcdf4==1.5.4
+
+    # retrieve CFM source from git repository and open permissions
+    mkdir -p /usr/local/cfm
+    git clone https://github.com/UWGlaciology/CommunityFirnModel /usr/local/cfm
+    chmod a+rwx -R /usr/local/cfm
