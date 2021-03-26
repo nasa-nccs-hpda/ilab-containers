@@ -12,6 +12,11 @@ FROM: ./ilab-core-7.0.0.sif
 		a.	xarray
 ===========================================================================
 
+%environment
+    # set PYTHONPATH for access to CFM application
+    export PYTHONPATH="/usr/local/cfm:/usr/local/cfm/CFM_main"
+    export PATH="/usr/local/cfm/CFM_main":$PATH
+
 %post
 
     #pip install CFM dependencies
@@ -22,3 +27,4 @@ FROM: ./ilab-core-7.0.0.sif
     mkdir -p /usr/local/cfm
     git clone https://github.com/UWGlaciology/CommunityFirnModel /usr/local/cfm
     chmod a+rwx -R /usr/local/cfm
+    cd /usr/local/cfm/CFM_main
