@@ -14,12 +14,13 @@ FROM: ./ilab-core-7.0.0.sif
 
 %environment
     # set PYTHONPATH for access to CFM application
-    export PYTHONPATH="/usr/local/cfm:/usr/local/cfm/CFM_main"
-    export PATH="/usr/local/cfm/CFM_main":$PATH
+    export PYTHONPATH=$PYTHONPATH:"/usr/local/cfm:/usr/local/cfm/CFM_main"
+    export PATH=$PATH:"/usr/local/cfm/CFM_main"
 
 %post
 
     #pip install CFM dependencies
+    pip install --upgrade pandas==1.1.4
     pip install --upgrade xarray==0.16.2
     pip install --upgrade netcdf4==1.5.4
 
