@@ -1,0 +1,32 @@
+## Generate Python ecosystem container image using singularity recipe
+Bootstrap: localimage
+#FROM: ./ilab-otb-gpu-2.0.0.simg
+#FROM: ./il-test.simg
+FROM: ilab-salad-1.1.0.simg 
+
+%labels
+    Author Remi Cresson <remi.cresson[at]irstea[dot]fr>
+    Version v1.0.0
+
+%help
+===========================================================================
+        - Semi-Automatic Landslide Detection System (SALaD)
+===========================================================================
+
+%environment
+    # ----------------------------------------------------------------------------
+    # Add important environment variables
+    # ----------------------------------------------------------------------------
+
+    # set PYTHONPATH for access to OTB application
+    export PYTHONPATH="/usr/local/salad/src/innovation-lab:$PYTHONPATH"
+
+%post
+
+# Below added 6/15/21
+    #pip install -U spopt
+    #pip3 install --upgrade spopt==0.1.1
+    #pip3 install --upgrade spopt==0.1.0
+    #python -m pip install --upgrade spopt
+    #pip3 install --upgrade Pysal==2.4.0
+     pip3 install Pysal==1.14.4 
