@@ -1,0 +1,20 @@
+## Generate Python ecosystem container image using singularity recipe
+Bootstrap: docker
+FROM: qgis/qgis
+
+%labels
+    Author gtamkin
+    Version v1.0.0
+
+%help
+===========================================================================
+	- python3-qgis-docker – QGIS Desktop Application (derived from Docker image):
+===========================================================================
+
+%post
+
+    # install python
+    ls -l
+    apt-get update && apt-get install -y \
+        binutils \
+        && strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
