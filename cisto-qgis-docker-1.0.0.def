@@ -14,7 +14,17 @@ FROM: qgis/qgis
 %post
 
     # install python
-    ls -l
     apt-get update && apt-get install -y \
         binutils \
         && strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5
+
+    pip install tqdm
+    pip install torch
+    pip install xarray
+    pip install rasterio
+    pip install hummingbird
+    pip install scipy
+    pip install sklearn
+    pip install dask
+    ln -sf /usr/bin/python3.8 /usr/local/bin/python
+
