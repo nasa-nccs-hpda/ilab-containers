@@ -1,0 +1,12 @@
+FROM maap-ilab-base-proj-0.1.0:latest
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#-------------------------------------------------------------------------------
+RUN pip install holoviews geoviews Hvplot datashader
+
+RUN pip uninstall -y shapely
+RUN pip install --no-binary :all: shapely
+
+RUN cd /projects
+
