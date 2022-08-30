@@ -1,4 +1,4 @@
-FROM maap-ilab-base-proj-0.1.0:latest
+FROM gtamkin/maap-ilab-base-proj-0.1.0:latest
 
 #-------------------------------------------------------------------------------
 # System Dependencies
