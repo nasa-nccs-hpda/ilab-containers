@@ -1,0 +1,17 @@
+FROM gtamkin/ilab-base-gdal-3.3.3-v2:latest
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY Amazon_Dashboard /usr/src/app/Amazon_Dashboard
+
+ENV PYTHONPATH=$PYTHONPATH:/usr/src/app/Amazon_Dashboard:.
+
+RUN pip install tzwhere
+
+RUN cat /etc/os-release | grep 20
+RUN gdalinfo --formats | grep -i jpeg
+RUN gdalinfo --formats | grep -i hdf
+RUN ogrinfo --formats | grep GDB
+RUN python -V | grep 3
+RUN python -c 'from osgeo import gdal; print(gdal.__version__)'
+

@@ -1,0 +1,32 @@
+FROM gtamkin/ilab-base-gdal-3.3.3-v2-maap:latest
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#-------------------------------------------------------------------------------
+RUN apt update && apt-get update
+
+RUN apt remove -y libproj-dev
+RUN apt remove -y proj-data
+
+RUN apt-get install -y libgeos-dev
+#RUN apt-get install -y libgeos-dev libgeos++-dev libgeos-3.8.0 libgeos-c1v5 libgeos-doc
+RUN apt install -y cmake
+RUN which cmake
+RUN apt install -y sqlite3
+RUN apt install -y curl && apt-get install -y libcurl4-openssl-dev
+RUN apt-get install -y libtiff5-dev
+
+RUN wget https://download.osgeo.org/proj/proj-9.0.0.tar.gz
+RUN tar -xf proj-9.0.0.tar.gz
+#RUN cd proj-9.0.0
+RUN mkdir build
+#RUN cd build
+RUN pwd
+RUN ls -alRt
+#RUN ls -alRt ..
+RUN /usr/bin/cmake /usr/src/app/proj-9.0.0
+#RUN /usr/bin/cmake ..
+RUN /usr/bin/cmake --build .
+RUN /usr/bin/cmake --build . --target install
+#RUN cp ./bin/* /bin
+

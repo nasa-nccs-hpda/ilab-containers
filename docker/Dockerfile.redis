@@ -1,0 +1,56 @@
+FROM osgeo/gdal:ubuntu-full-3.3.3
+
+ENV PYTHONPATH="/usr/local/lib/python3.8/dist-packages"
+ENV REDIS_PORT="6379"
+
+
+ENV PROJECT_PATH="/usr/local/ilab"
+RUN echo $PROJECT_PATH
+ENV REDIS_FILE="/etc/profile.d/redis_server.sh"
+RUN mkdir -p $PROJECT_PATH
+
+RUN mkdir -p /att/nobackup /lscratch /att/gpfsfs/atrepo01 /att/pubrepo /css/nga/INDEX/current/nga_footprint.gdb
+#RUN for i in $(seq 1 30); do
+#RUN 	ln -s /gpfs/gsfs${i} /gs${i};
+#RUN done
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+         python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
+          libsqlite3-dev libx11-dev libgeos++-dev libproj-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
+     rm -rf /var/lib/apt/lists/* && \
+     rm -rf /var/cache/apt
+
+RUN python -m pip install --upgrade pip
+RUN python -m pip install celery[redis]
+RUN python -m pip install redis
+RUN python -m pip install redis-server
+
+RUN python -V | grep 3
+
+#ENV pyVer="`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'`"
+#RUN ln -sf /usr/local/lib/python${pyVer}/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
+RUN ln -sf /usr/local/lib/python3.8/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
+
+RUN echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE;
+RUN echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE;
+RUN chmod +x $REDIS_FILE;
+
+RUN /bin/bash -c "source /etc/profile.d/redis_server.sh"
+RUN exec "$@"
+#RUN /bin/bash -c "pkill redis-server"
+
+#%startscript
+    #/bin/bash -c "export REDIS_PORT=6379"
+RUN exec /bin/bash -c "source /etc/profile.d/redis_server.sh"
+
+#%test
+
+RUN cat /etc/os-release | grep 20
+RUN gdalinfo --formats | grep -i jpeg
+RUN gdalinfo --formats | grep -i hdf
+RUN ogrinfo --formats | grep GDB
+RUN python -V | grep 3
+RUN python -c 'from osgeo import gdal; print(gdal.__version__)'
+

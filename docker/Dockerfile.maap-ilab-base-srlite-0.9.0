@@ -1,0 +1,38 @@
+#FROM osgeo/gdal:ubuntu-full-3.3.3
+#FROM mas.ops.maap-project.org/root/jupyter-image/vanilla:develop
+FROM gtamkin/ilab-base-gdal-3.3.3-v2-maap:latest
+
+RUN mkdir -p /usr/src/app/srlite
+WORKDIR /usr/src/app/srlite
+COPY notebooks/srlite_warp_example_rma_demo.ipynb /usr/src/app/srlite
+ADD ./notebooks /usr/src/app/srlite/notebooks
+ADD ./input/Fairbanks /usr/src/app/srlite/input/Fairbanks
+
+ENV PROJECT_PATH="/usr/local/ilab"
+#-------------------------------------------------------------------------------
+# System Dependencies
+#-------------------------------------------------------------------------------
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
+	libsqlite3-dev libx11-dev libgeos++-dev libproj-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/cache/apt
+
+# Added for SR-Lite
+RUN python -m pip install plotnine
+RUN python -m pip install pygeotools
+
+RUN mkdir -p ${PROJECT_PATH}
+
+# RECOMMENDED LOCATION - CURRENTLY INCLUDED IN CORE
+RUN git clone --single-branch --branch srlite-0.9.13-08012022-GLAD-ARD https://github.com/nasa-nccs-hpda/srlite.git \
+		${PROJECT_PATH}/srlite
+RUN chmod a+rwx -R ${PROJECT_PATH}/*
+
+RUN python -m pip cache purge
+
+RUN python -V | grep 3
+RUN python -c 'from osgeo import gdal; print(gdal.__version__)'
+RUN ls -alRt /usr/src/app/srlite

@@ -1,0 +1,125 @@
+FROM osgeo/gdal:ubuntu-full-3.3.3
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+#COPY Dockerfile.ilab-base-gdal-3.3.3-v2 /usr/src/app/
+    
+ENV PROJECT_PATH="/usr/local/ilab"
+ENV REDIS_FILE="/etc/profile.d/redis_server.sh"
+RUN mkdir -p $PROJECT_PATH
+
+#-------------------------------------------------------------------------------
+# Make NCCS specific links
+#-------------------------------------------------------------------------------
+RUN mkdir -p /att/nobackup /lscratch /att/gpfsfs/atrepo01 /att/pubrepo /css/nga/INDEX/current/nga_footprint.gdb
+# TODO:  Deal with /gpfs weirdness below.  Doesn't this break container portability?
+#RUN for i in $(seq 1 30); do
+#RUN 	ln -s /gpfs/gsfs${i} /gs${i};
+#RUN done
+
+#-------------------------------------------------------------------------------
+# System Dependencies
+#-------------------------------------------------------------------------------
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
+	libsqlite3-dev libx11-dev libgeos++-dev libproj-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm -rf /var/cache/apt
+
+#-------------------------------------------------------------------------------
+# Tools 
+# 1/21/22 - added installation of 2to3 RUN python conversion tool
+#-------------------------------------------------------------------------------
+RUN pip install 2to3
+
+#-------------------------------------------------------------------------------
+# RUN python Stack
+#-------------------------------------------------------------------------------
+RUN python -m pip install --upgrade pip
+
+RUN python -m pip install awscli s3fs
+RUN python -m pip install celery[redis]
+RUN python -m pip install certifi
+RUN python -m pip install cryptography
+RUN python -m pip install Cython
+RUN python -m pip install dask
+RUN python -m pip install decorator
+RUN python -m pip install dill
+RUN python -m pip install distributed
+RUN python -m pip install docutils
+RUN python -m pip install fiona
+RUN python -m pip install flower
+RUN python -m pip install geopandas
+RUN python -m pip install h5py
+RUN python -m pip install imageio
+RUN python -m pip install ipykernel
+RUN python -m pip install ipython
+RUN python -m pip install ipython-genutils
+RUN python -m pip install ipywidgets
+RUN python -m pip install matplotlib
+RUN python -m pip install netcdf4
+RUN python -m pip install networkx
+RUN python -m pip install notebook
+RUN python -m pip install numba
+RUN python -m pip install numexpr
+RUN python -m pip install numpy
+RUN python -m pip install pandas
+RUN python -m pip install pyhdf
+RUN python -m pip install pyproj
+RUN python -m pip install Pysal
+RUN python -m pip install PyYAML
+RUN python -m pip install rasterio
+RUN python -m pip install redis
+RUN python -m pip install redis-server
+RUN python -m pip install requests
+RUN python -m pip install rioxarray
+RUN python -m pip install scikit-image
+RUN python -m pip install scikit-learn
+RUN python -m pip install scipy
+RUN python -m pip install seaborn
+RUN python -m pip install shapely
+RUN python -m pip install cartopy
+RUN python -m pip install xarray
+RUN python -m pip install urllib3
+RUN python -m pip install zarr
+RUN python -m pip install ray[default]
+
+# Added for SR-Lite
+RUN python -m pip install plotnine
+RUN python -m pip install pygeotools
+
+RUN python -m pip cache purge
+
+    # Add redis-server binary to /usr/local/bin
+#    export pyVer=`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'`
+RUN ln -sf /usr/local/lib/python3.8/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
+    
+    # 3/11/22 modified by Caleb for verson 2.0.0 for testing of 2 lines below
+    # 5/4/22 Testing passed. nepac and.. app containers also passed so making this ilab-base-3.3.3-v2 the new production version 2.
+    # Setup redis-server daemon. Sets REDIS_PORT env variable for celery-based applications to reference the correct redis port at run-time.
+    # echo "export REDIS_PORT=\"\$(python -c 'import socket; s = socket.socket(); s.bind((\"\", 0)); print(s.getsockname()[1]); s.close();')\"" > $REDIS_FILE
+RUN echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE;
+RUN echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE;
+RUN chmod +x $REDIS_FILE;
+
+# TODO:  Automate REDIS life-cycle.
+### %runscript
+###     /bin/bash -c "source /etc/profile.d/redis_server.sh"
+###     exec "$@"
+###     /bin/bash -c "pkill redis-server"
+
+### %startscript
+###     #/bin/bash -c "export REDIS_PORT=6379"
+###     exec /bin/bash -c "source /etc/profile.d/redis_server.sh"
+### 
+### %test
+
+RUN cat /etc/os-release | grep 20
+RUN gdalinfo --formats | grep -i jpeg
+RUN gdalinfo --formats | grep -i hdf
+RUN ogrinfo --formats | grep GDB
+RUN python -V | grep 3
+RUN python -c 'from osgeo import gdal; print(gdal.__version__)'
+
