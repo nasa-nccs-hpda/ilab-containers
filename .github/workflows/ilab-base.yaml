@@ -25,9 +25,16 @@ jobs:
     needs:
       - changes
     runs-on: ubuntu-latest
+    
     container:
       image: quay.io/singularity/singularity:v${{ matrix.singularity_version }}
       options: --privileged      
+
+    name: Check ilab-base
+    steps:
+
+      - name: Check out code for the container builds
+        uses: actions/checkout@v2
 
       - name: Build Container
         run: |
