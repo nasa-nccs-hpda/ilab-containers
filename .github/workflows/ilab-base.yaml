@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     
     container:
-      image: quay.io/singularity/singularity
+      image: quay.io://singularity/singularity
       options: --privileged      
 
     name: Check ilab-base
