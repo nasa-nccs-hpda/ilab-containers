@@ -25,14 +25,6 @@ jobs:
     needs:
       - changes
     runs-on: ubuntu-latest
-    strategy:
-      # Keep going on other deployments if anything bloops
-      fail-fast: false
-      matrix:
-        changed_file: ${{ fromJson(needs.changes.outputs.changed_file) }}
-        singularity_version:
-          - '3.8.1'
-
     container:
       image: quay.io/singularity/singularity:v${{ matrix.singularity_version }}
       options: --privileged      
