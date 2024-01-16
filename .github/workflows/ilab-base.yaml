@@ -1,52 +1,81 @@
-name: Singularity Build (docker)
-on: 
+name: ilab-base-docker
+
+on:
   push:
-
-    # Edit the branches here if you want to change deploy behavior
     branches:
-      - github-registry-changes
-
-  # Do the builds on all pull requests (to test them)
-  pull_request: []
+      - 'main'
 
 jobs:
-  changes:
-    name: "Changed Singularity Recipes"
+
+  ilab-base-production:
     runs-on: ubuntu-latest
-    outputs:
-      changed_file: ${{ steps.files.outputs.added_modified }}
     steps:
-      - id: files
-        uses: jitterbit/get-changed-files@b17fbb00bdc0c0f63fcf166580804b4d2cdc2a42
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          format: 'json'
-  
-  build-containers:
-    needs:
-      - changes
-    runs-on: ubuntu-latest
-    
-    container:
-      image: quay.io/singularity/singularity:v3.11.5
-      options: --privileged      
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    name: Check ilab-base
-    steps:
-
-      - name: Check out code for the container builds
-        uses: actions/checkout@v2
-
-      - name: Build Container
+      - 
+        name: Lower github-runner storage
         run: |
-         ls
-         sudo -E singularity build container.sif singularity/ilab-base/ilab-base.def
-         echo "Tag is $tag."
-         echo "tag=$tag" >> $GITHUB_ENV
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - name: Login and Deploy Container
-        if: (github.event_name != 'pull_request')
-        env:
-          keepgoing: ${{ env.keepgoing }}
-        run: |         
-          echo ${{ secrets.GITHUB_TOKEN }} | singularity remote login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
-          singularity push container.sif oras://ghcr.io/${GITHUB_REPOSITORY}:${tag}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./docker/ilab-base/Dockerfile.ilab-base-gdal-3.3.3
+          push: true
+          tags: nasanccs/ilab-base:latest
+
+  ilab-base-dev:
+    runs-on: ubuntu-latest
+    on: [push, pull_request]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - 
+        name: Lower github-runner storage
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./requirements/Dockerfile
+          push: true
+          tags: nasanccs/ilab-base:dev
