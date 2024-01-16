@@ -43,7 +43,7 @@ jobs:
           push: true
           tags: nasanccs/ilab-base:latest
 
-  ilab-base-3.3.3-production:
+  ilab-base-3-3-3-production:
     runs-on: ubuntu-latest
     steps:
       -
