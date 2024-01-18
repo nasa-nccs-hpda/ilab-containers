@@ -71,7 +71,8 @@ RUN python -m pip install Pysal
 RUN python -m pip install PyYAML
 RUN python -m pip install rasterio
 RUN python -m pip install redis
-RUN python -m pip install redis-server
+#RUN python -m pip install redis-server
+RUN python -m pip install redis-py
 RUN python -m pip install requests
 RUN python -m pip install rioxarray
 RUN python -m pip install scikit-image
@@ -93,15 +94,15 @@ RUN python -m pip cache purge
 
 # Add redis-server binary to /usr/local/bin
 #    export pyVer=`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'`
-RUN ln -sf /usr/local/lib/python3.8/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
+# RUN ln -sf /usr/local/lib/python3.8/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
     
 # 3/11/22 modified by Caleb for verson 2.0.0 for testing of 2 lines below
 # 5/4/22 Testing passed. nepac and.. app containers also passed so making this ilab-base-3.3.3-v2 the new production version 2.
 # Setup redis-server daemon. Sets REDIS_PORT env variable for celery-based applications to reference the correct redis port at run-time.
 # echo "export REDIS_PORT=\"\$(python -c 'import socket; s = socket.socket(); s.bind((\"\", 0)); print(s.getsockname()[1]); s.close();')\"" > $REDIS_FILE
-RUN echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE;
-RUN echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE;
-RUN chmod +x $REDIS_FILE;
+# RUN echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE;
+# RUN echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE;
+# RUN chmod +x $REDIS_FILE;
 
 # TODO:  Automate REDIS life-cycle.
 ### %runscript
