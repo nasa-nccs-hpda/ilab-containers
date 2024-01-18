@@ -70,9 +70,9 @@ RUN python -m pip install pyproj
 RUN python -m pip install Pysal
 RUN python -m pip install PyYAML
 RUN python -m pip install rasterio
-RUN python -m pip install redis
+#RUN python -m pip install redis
+RUN python -m pip install "redis[hiredis]"
 #RUN python -m pip install redis-server
-RUN python -m pip install redis-py
 RUN python -m pip install requests
 RUN python -m pip install rioxarray
 RUN python -m pip install scikit-image
