@@ -13,7 +13,7 @@ jobs:
     env:
       SINGULARITY_IMAGE: quay.io/singularity/singularity:v3.11.5
       CONTAINER_NAME: ilab-base-singularity
-      CONTAINER_DEFINITION_FILE_PATH: singularity/ilab-base/ilab-base.def
+      CONTAINER_DEFINITION_FILE_PATH: singularity/ilab-base/ilab-base_dev.def
       CONTAINER_TAG: latest
 
     runs-on: ubuntu-latest
@@ -30,7 +30,7 @@ jobs:
 
       - name: Build Container
         run: |
-         sudo -E singularity build container.sif singularity/ilab-base/ilab-base.def
+         sudo -E singularity build container.sif singularity/ilab-base/ilab-base_dev.def
 
       - name: Login and Deploy Container
         if: (github.event_name != 'pull_request')
