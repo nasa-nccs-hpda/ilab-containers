@@ -67,6 +67,7 @@ FROM: ghcr.io/osgeo/gdal:ubuntu-full-3.9.1
     # Python Stack
     #-------------------------------------------------------------------------------
     #python -m pip install --upgrade pip
+    rm -rf /usr/lib/python*/EXTERNALLY-MANAGED
     pip install pipx
     python -m pipx install --upgrade pip
 
