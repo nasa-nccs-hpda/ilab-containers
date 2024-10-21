@@ -1,0 +1,41 @@
+# TODO:
+# - only build when the recipe file changes, or on a periodic schedule
+
+name: ilab-base dev (singularity)
+
+on: 
+  push:
+
+jobs:
+  
+  build-container-dev:
+
+    env:
+      SINGULARITY_IMAGE: quay.io/singularity/singularity:v3.11.5
+      CONTAINER_NAME: ilab-base-singularity
+      CONTAINER_DEFINITION_FILE_PATH: singularity/ilab-base/ilab-base.def
+      CONTAINER_TAG: latest
+
+    runs-on: ubuntu-latest
+    
+    container:
+      image: quay.io/singularity/singularity:v3.11.5
+      options: --privileged      
+
+    name: Check Software
+    steps:
+
+      - name: Check out code for the container builds
+        uses: actions/checkout@v2
+
+      - name: Build Container
+        run: |
+         sudo -E singularity build container.sif singularity/ilab-base/ilab-base.def
+
+      - name: Login and Deploy Container
+        if: (github.event_name != 'pull_request')
+        env:
+          keepgoing: ${{ env.keepgoing }}
+        run: |         
+          echo ${{ secrets.GITHUB_TOKEN }} | singularity remote login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
+          singularity push container.sif oras://ghcr.io/nasa-nccs-hpda/${CONTAINER_NAME}:${CONTAINER_TAG}
