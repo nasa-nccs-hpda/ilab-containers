@@ -1,0 +1,48 @@
+#-----------------------------------------------------------------------------------------
+# Build modis_water container
+#-----------------------------------------------------------------------------------------
+Bootstrap: oras
+# FROM: gitlab.nccs.nasa.gov:5050/cisto-ilab/containers/ilab-base:1.0.0
+#FROM: gitlab.nccs.nasa.gov:5050/cisto-ilab/containers/ilab-base:gdal-3.3.3
+#FROM: gitlab.nccs.nasa.gov:5050/cisto-ilab/containers/ilab-base:gdal-3.3.3-v2
+#FROM: gitlab.nccs.nasa.gov:5050/cisto-ilab/containers/ilab-base:gdal-3.3.3-v5
+FROM: gitlab.nccs.nasa.gov:5050/cisto-ilab/containers/ilab-base:6.1.0
+
+%labels
+    cisto_author sstrong
+    #Version v3.0.1
+    Version v4.1.1
+
+%help
+===========================================================================
+	- modis_water 1.0.0
+  - renamed version to 2.0.0 at Rogers request to match his code repo
+  - 5/5/22 version 2.0.1 includes new ilab-base_gdal-3.3.3-v2.sif that contains redis startup code
+  - 10/4/22 version 2.2.0 Updated to include new ilab-base-gdal-3.3.3-v5.sif. The new ilab-base version 4 fixes broken links that existed after explore path migration.
+  - 12/20/22 version 3.0.0 Updated to correct issue with Production rules.
+  - 12/22/22 version 3.0.1 The MCD64A1 and the QA and SevenClass exclusion tile parameters were updated. 
+  - 03/10/23 version 4.0.0 Updated with new ilab-base 6.1.0 that contains latest gdal of 3.6.2
+  - 04/07/23 version 4.1.0 updated the simple classification algorithm and implemented post processing. GMTED/DEM products and Static Seven Class products are no longer supported. 
+  - 08/09/23 version 4.1.1 Fixed Bug found in seven class generation where no-data was not properly set using the correct no-data. The correct no-data is the one found in the ancillary mask. This fix changes the code to make sure anywhere on the seven class array the ancillary mask indicates no-data, the seven-class value is set to 250.
+===========================================================================
+
+%environment
+    export PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+
+%post
+
+    PROJECT_PATH="/usr/local/ilab"
+
+    #-------------------------------------------------------------------------------
+    # System Dependencies
+    #-------------------------------------------------------------------------------
+ 
+    #-------------------------------------------------------------------------------
+    # modis_water Git Dependencies
+    #-------------------------------------------------------------------------------
+    mkdir -p ${PROJECT_PATH}
+    git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git \
+		${PROJECT_PATH}/core
+    git clone --single-branch --branch master https://${GITHUB_TOKEN}@github.com/nasa-nccs-hpda/modis_water.git \
+		${PROJECT_PATH}/modis_water
+    chmod a+rwx -R ${PROJECT_PATH}/*
