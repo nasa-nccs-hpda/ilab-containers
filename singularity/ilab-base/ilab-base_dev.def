@@ -1,154 +1,109 @@
-#-----------------------------------------------------------------------------------------
-# Build ilab-base container
-# gdal build: https://github.com/OSGeo/gdal/blob/master/gdal/docker/ubuntu-full/Dockerfile
-#  https://github.com/nasa-nccs-hpda/core/blob/master/container/cisto-gdal-2.0.0.def
-#-----------------------------------------------------------------------------------------
-Bootstrap: docker
-# FROM: osgeo/gdal:ubuntu-full-latest
-# FROM: osgeo/gdal:ubuntu-full-3.4.0
-# FROM: osgeo/gdal:ubuntu-full-3.6.2
-FROM: ghcr.io/osgeo/gdal:ubuntu-full-3.9.1
+# vhr-toolkit combined container
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.9.2
 
+# Arguments to pass to the image
+ARG PROJECT_PATH="/usr/local/ilab"
 
-%labels
-    gdal_maintainer Even Rouault <even.rouault@spatialys.com>
-    cisto_author gtamkin
-    cisto_modified sstrong
-    Version v6.2.0
+# Environment
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+ENV REDIS_PORT="6379"
+ENV REDIS_FILE="/etc/profile.d/redis_server.sh"
 
-%help
-===========================================================================
-	- python3-data-science – contains the Python data science ecosystem:
-		a.	NumPy
-		b.	SciPy
-		c.	matplotlib
-		d.	IPython
-		e.	pandas
-		f.	Scikit-learn
-    - V6 includes latest GDAl version 3.6.2.
-    - 2/23:  v6.1.0 Included REDIS code that Caleb updated in the ilab-base-gdal-3.3.3-v5.def file.
-    - 7/8/24: v6.2.0 Rebuilding for new and latest versions.
-    
-===========================================================================
+# Ubuntu needs noninteractive to be forced
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CPLUS_INCLUDE_PATH="/usr/include/gdal"
+ENV C_INCLUDE_PATH="/usr/include/gdal"
+ENV PROJ_LIB="/usr/share/proj"
+ENV PROJ_DATA="/usr/share/proj"
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
 
-%environment
-    export PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
-    #1/7/22 - Replaced with correct python path
-    #export PYTHONPATH="$PYTHONPATH:/usr/local/lib/python3.8/dist-packages"
-    export PYTHONPATH="/usr/local/lib/python3.8/dist-packages"
-    export REDIS_PORT="6379"
-
-%post
-
-    PROJECT_PATH="/usr/local/ilab"
-    REDIS_FILE="/etc/profile.d/redis_server.sh"
-    mkdir -p $PROJECT_PATH
-
-    #-------------------------------------------------------------------------------
-    # Make NCCS specific links
-    #-------------------------------------------------------------------------------
-    #mkdir -p /att/nobackup /lscratch /att/gpfsfs/atrepo01 /att/pubrepo /css/nga/INDEX/current/nga_footprint.gdb
-    #for i in $(seq 1 30); do
-    #    ln -s /gpfs/gsfs${i} /gs${i};
-    #done
-
-    #-------------------------------------------------------------------------------
-    # System Dependencies
-    #-------------------------------------------------------------------------------
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+RUN PROJECT_PATH="/usr/local/ilab" && \
+    REDIS_FILE="/etc/profile.d/redis_server.sh" && \
+    echo $PROJECT_PATH && \
+    mkdir -p $PROJECT_PATH && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
-        libsqlite3-dev libx11-dev libgeos++-dev libproj-dev
+        libsqlite3-dev libx11-dev libgeos++-dev libproj-dev \
+        build-essential parallel libdatetime-perl gawk util-linux bc \
+        python3-tk tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev \
+        zlib1g-dev liblzma-dev libgirepository1.0-dev libcairo2-dev \
+        pkg-config gir1.2-gtk-3.0 libnetcdf-dev libhdf4-dev 2to3 && \
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt
 
-    #-------------------------------------------------------------------------------
-    # Python Stack
-    #-------------------------------------------------------------------------------
-    #pip install --upgrade pip
-    rm -rf /usr/lib/python*/EXTERNALLY-MANAGED
-    pip install pipx
-    #pipx install --upgrade pip
-
-
-    pip install awscli s3fs
-    pip install celery[redis]
-    pip install certifi
-    pip install cryptography
-    pip install Cython
-    pip install dask
-    pip install decorator
-    pip install dill
-    pip install distributed
-    pip install docutils
-    pip install fiona
-    pip install flower
-    pip install geopandas
-    pip install h5py
-    pip install imageio
-    pip install ipykernel
-    pip install ipython
-    pip install ipython-genutils
-    pip install ipywidgets
-    pip install matplotlib
-    pip install netcdf4
-    pip install networkx
-    pip install notebook
-    pip install numba
-    pip install numexpr
-    pip install numpy
-    pip install pandas
-    pip install pyhdf
-    pip install pyproj
-    pip install Pysal
-    pip install PyYAML
-    pip install rasterio
-    pip install redis
-    pip install requests
-    pip install rioxarray
-    pip install scikit-image
-    pip install scikit-learn
-    pip install scipy
-    pip install seaborn
-    pip install shapely
-    pip install cartopy
-    pip install xarray
-    pip install urllib3
-    pip install zarr
-
+RUN rm -rf /usr/lib/python*/EXTERNALLY-MANAGED && \
+    pip install pipx && \
+    pip install rasterio && \
+    pip install awscli s3fs && \
+    pip install celery[redis] && \
+    pip install certifi && \
+    pip install cryptography && \
+    pip install Cython && \
+    pip install dask && \
+    pip install decorator && \
+    pip install dill && \
+    pip install distributed && \
+    pip install docutils && \
+    pip install fiona && \
+    pip install flower && \
+    pip install geopandas && \
+    pip install h5py && \
+    pip install imageio && \
+    pip install ipykernel && \
+    pip install ipython && \
+    pip install ipython-genutils && \
+    pip install ipywidgets && \
+    pip install matplotlib && \
+    pip install netcdf4 && \
+    pip install networkx && \
+    pip install notebook && \
+    pip install numba && \
+    pip install numexpr && \
+    pip install numpy && \
+    pip install pandas && \
+    pip install pyhdf && \
+    pip install pyproj && \
+    pip install Pysal && \
+    pip install PyYAML && \
+    pip install rasterio && \
+    pip install redis && \
+    pip install requests && \
+    pip install rioxarray && \
+    pip install scikit-image && \
+    pip install scikit-learn && \
+    pip install scipy && \
+    pip install seaborn && \
+    pip install shapely && \
+    pip install cartopy && \
+    pip install xarray && \
+    pip install urllib3 && \
+    pip install zarr && \
+    pip install earthengine-api cubo[ee] && \
+    pip install 2to3 psycopg2-binary && \
+    pip install plotnine && \
+    pip install --upgrade pylr2 && \
+    pip install git+https://github.com/dshean/pygeotools.git@master && \ 
+    pip install xgboost && \ 
+    pip install pytest && \ 
+    pip install coveralls && \ 
     pip cache purge
 
+RUN PROJECT_PATH="/usr/local/ilab" && \
+    REDIS_FILE="/etc/profile.d/redis_server.sh" && \
+    echo $PROJECT_PATH && \
+    mkdir -p $PROJECT_PATH && \
     # Add redis-server binary to /usr/local/bin
-    export pyVer=`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'`
-    ln -sf /usr/local/lib/python${pyVer}/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server
+    export pyVer=`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'` && \
+    ln -sf /usr/local/lib/python${pyVer}/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server && \
+    echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE && \
+    echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE && \
+    chmod +x $REDIS_FILE & \
+    mkdir -p "/usr/local/ilab" && \
+    chmod a+rwx -R /usr/local/ilab/*
 
-    # --------------- 2/16/23 Adding this from ilab-base-gdal-3.3.3-v5.def file
-    
-    # 3/11/22 modified by Caleb for verson 2.0.0 for testing of 2 lines below
-    # 5/4/22 Testing passed. nepac and.. app containers also passed so making this ilab-base-3.3.3-v2 the new production version 2.
-    # Setup redis-server daemon. Sets REDIS_PORT env variable for celery-based applications to reference the correct redis port at run-time.
-    # echo "export REDIS_PORT=\"\$(python -c 'import socket; s = socket.socket(); s.bind((\"\", 0)); print(s.getsockname()[1]); s.close();')\"" > $REDIS_FILE
-    echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE;
-    echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE;
-    chmod +x $REDIS_FILE;
-
-%runscript
-    /bin/bash -c "source /etc/profile.d/redis_server.sh"
-    exec "$@"
-    /bin/bash -c "pkill redis-server"
-
-%startscript
-    #/bin/bash -c "export REDIS_PORT=6379"
-    exec /bin/bash -c "source /etc/profile.d/redis_server.sh"
-
-    # --------------------------------------------------------------------------
-
-%test
-
-    cat /etc/os-release | grep 20
-    gdalinfo --formats | grep -i jpeg
-    gdalinfo --formats | grep -i hdf
-    ogrinfo --formats | grep GDB
-    python -V | grep 3
-    python -c 'from osgeo import gdal; print(gdal.__version__)'
+HEALTHCHECK NONE
+ENTRYPOINT []
+CMD ["/bin/bash"]
