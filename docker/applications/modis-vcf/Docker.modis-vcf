@@ -1,5 +1,5 @@
-#FROM gtamkin/ilab-base-gdal-3.3.3-v2:latest
-FROM docker://nasanccs/ilab-base:latest
+FROM gtamkin/ilab-base-gdal-3.3.3-v2:latest
+#FROM docker://nasanccs/ilab-base:latest
 
 #-------------------------------------------------------------------------------
 # - 1/12/23  modis-vcf 1.0.0 -initial container built with pyarrow
