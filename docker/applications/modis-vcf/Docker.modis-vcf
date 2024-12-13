@@ -27,11 +27,11 @@ RUN python -m pip install --upgrade pip
 RUN pip install 2to3
 RUN pip install pyarrow
 #RUN python -m pip install h5py
-RUN pip3 install --upgrade numpy==1.23.3
+#RUN pip3 install --upgrade numpy==1.23.3
 #11/6/24 cu12 installation
 #pip install --extra-index-url=https://gcc02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpypi.nvidia.com%2F&data=05%7C02%7Csavannah.strong%40nasa.gov%7Cbf3e36e0e5b24155ca1408dcfe6c0479%7C7005d45845be48ae8140d43da96dd17b%7C0%7C0%7C638664987082439483%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=sIHhOdkaYBooNf5HQB3HehJPVj62y5pWkUhCFt0tqew%3D&reserved=0cuml-cu12==24.10.*
 #pip install cuml-cu12
-pip install --extra-index-url https://pypi.nvidia.com cuml-cu12
+#pip install --extra-index-url https://pypi.nvidia.com cuml-cu12
 
 #-------------------------------------------------------------------------------
 # modis-vcf Git Dependencies
