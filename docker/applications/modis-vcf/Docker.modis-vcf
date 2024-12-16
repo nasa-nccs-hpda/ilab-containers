@@ -11,8 +11,8 @@ FROM nvcr.io/nvidia/rapidsai/base:24.10-cuda12.5-py3.10
 # - 11/13/24 modis-vcf 1.2.2 -Converting to Docker build format
 #-------------------------------------------------------------------------------
 
-ENV PYTHONPATH=$PYTHONPATH:/usr/local/ilab
-ENV PROJECT_PATH="/usr/local/ilab"
+ENV PYTHONPATH=$PYTHONPATH:/usr/local/ilab/
+ENV PROJECT_PATH="/usr/local/ilab/"
 
 RUN mkdir -p $PROJECT_PATH
 RUN chmod a+rwx -R $PROJECT_PATH/*
