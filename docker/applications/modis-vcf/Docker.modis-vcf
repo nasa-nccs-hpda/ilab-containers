@@ -15,6 +15,7 @@ ENV PYTHONPATH=$PYTHONPATH:/usr/local/ilab
 ENV PROJECT_PATH="/usr/local/ilab"
 
 RUN mkdir -p $PROJECT_PATH
+RUN chmod a+rwx -R $PROJECT_PATH/*
 #-------------------------------------------------------------------------------
 # System Dependencies
 #-------------------------------------------------------------------------------
@@ -39,4 +40,4 @@ RUN pip install pyarrow
 #-------------------------------------------------------------------------------
 
 RUN git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git $PROJECT_PATH/core
-RUN chmod a+rwx -R $PROJECT_PATH/*
+
