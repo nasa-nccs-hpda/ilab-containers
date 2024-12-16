@@ -11,24 +11,19 @@ FROM nvcr.io/nvidia/rapidsai/base:24.10-cuda12.5-py3.10
 # - 11/13/24 modis-vcf 2.0 -Converting to Docker build format
 #-------------------------------------------------------------------------------
  
-ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+# ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
 # Ubuntu needs noninteractive to be forced
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CPLUS_INCLUDE_PATH="/usr/include/gdal"
 ENV C_INCLUDE_PATH="/usr/include/gdal"
 ENV PROJ_LIB="/usr/share/proj"
 ENV PROJ_DATA="/usr/share/proj"
-ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
-ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab/modis_vcf"
-
+# ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+# ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab/modis_vcf"
 #-------------------------------------------------------------------------------
 # System Dependencies
 #-------------------------------------------------------------------------------
- 
-RUN PROJECT_PATH="/usr/local/ilab" && \
-    echo $PROJECT_PATH && \
-    mkdir -p $PROJECT_PATH && \
-    apt-get update && \
+RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
@@ -40,7 +35,6 @@ RUN PROJECT_PATH="/usr/local/ilab" && \
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt
- 
 #-------------------------------------------------------------------------------
 # Tools 
 # 1/12/23 - added installation of 2to3 python conversion tool
@@ -61,7 +55,6 @@ RUN git clone --single-branch --branch master https://github.com/pkolano/shift.g
     export LANG=en_US.UTF-8 && \
     locale-gen en_US.UTF-8 && \
     rm -rf /app
-
 # Pip
 RUN pip install \
     numpy \
@@ -80,16 +73,14 @@ RUN pip install \
     coveralls \
     rtree \
     GDAL==`ogrinfo --version | grep -Eo '[0-9]\.[0-9]\.[0-9]+'`
- 
 #-------------------------------------------------------------------------------
 # modis-vcf Git Dependencies
 #-------------------------------------------------------------------------------
-RUN mkdir -p "/usr/local/ilab" && \
-    git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git \
-        /usr/local/ilab/core && \
-    git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/modis_vcf.git \
-        /usr/local/ilab/modis_vcf
- 
+# RUN mkdir -p "/usr/local/ilab" && \
+#     git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git \
+#         /usr/local/ilab/core && \
+#     git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/modis_vcf.git \
+#         /usr/local/ilab/modis_vcf
 HEALTHCHECK NONE
 ENTRYPOINT []
 CMD ["/bin/bash"]
