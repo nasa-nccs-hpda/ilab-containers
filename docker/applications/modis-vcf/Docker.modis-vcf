@@ -3,43 +3,94 @@
 #FROM ghcr.io/osgeo/gdal:ubuntu-full-3.9.2
 #FROM docker://rapidsai/rapidsai-cloud-ml:22.10-cuda11.2-base-ubuntu20.04-py3.9
 FROM nvcr.io/nvidia/rapidsai/base:24.10-cuda12.5-py3.10
-
+ 
 #-------------------------------------------------------------------------------
 # - 1/12/23  modis-vcf 1.0.0 -initial container built with pyarrow
 # - 7/30/24  modis-vcf 1.0.1 -upgraded numpy to 1.23.3.scipy 1.10.0 requires numpy<1.27.0,>=1.19.5 and numba 0.56.4 requires numpy<1.24,>=1.18. *note ilab-base 6.1.0 has numpy 1.21, weird. 
 # - 11/6/24  modis-vcf 1.2.0 -Request from Roger to install cuML 
-# - 11/13/24 modis-vcf 1.2.2 -Converting to Docker build format
+# - 11/13/24 modis-vcf 2.0 -Converting to Docker build format
 #-------------------------------------------------------------------------------
+ 
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+# Ubuntu needs noninteractive to be forced
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CPLUS_INCLUDE_PATH="/usr/include/gdal"
+ENV C_INCLUDE_PATH="/usr/include/gdal"
+ENV PROJ_LIB="/usr/share/proj"
+ENV PROJ_DATA="/usr/share/proj"
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab/modis_vcf"
 
-ENV PYTHONPATH=$PYTHONPATH:/usr/local/ilab/
-ENV PROJECT_PATH="/usr/local/ilab/"
-
-#RUN mkdir -p $PROJECT_PATH
-RUN sudo mkdir -p /usr/local/ilab
-#RUN chmod a+rwx -R $PROJECT_PATH/*
-RUN chmod a+rwx -R /usr/local/ilab/
 #-------------------------------------------------------------------------------
 # System Dependencies
 #-------------------------------------------------------------------------------
-
-RUN python -m pip install --upgrade pip
-
+ 
+RUN PROJECT_PATH="/usr/local/ilab" && \
+    echo $PROJECT_PATH && \
+    mkdir -p $PROJECT_PATH && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
+        libsqlite3-dev libx11-dev libgeos++-dev libproj-dev \
+        build-essential parallel libdatetime-perl gawk util-linux bc \
+        python3-tk tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev \
+        zlib1g-dev liblzma-dev libgirepository1.0-dev libcairo2-dev \
+        pkg-config gir1.2-gtk-3.0 libnetcdf-dev libhdf4-dev 2to3 && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/apt
+ 
 #-------------------------------------------------------------------------------
 # Tools 
 # 1/12/23 - added installation of 2to3 python conversion tool
 #-------------------------------------------------------------------------------
-RUN pip install 2to3
-RUN pip install pyarrow
-#RUN python -m pip install h5py
-#RUN pip3 install --upgrade numpy==1.23.3
-#11/6/24 cu12 installation
-#pip install --extra-index-url=https://gcc02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpypi.nvidia.com%2F&data=05%7C02%7Csavannah.strong%40nasa.gov%7Cbf3e36e0e5b24155ca1408dcfe6c0479%7C7005d45845be48ae8140d43da96dd17b%7C0%7C0%7C638664987082439483%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=sIHhOdkaYBooNf5HQB3HehJPVj62y5pWkUhCFt0tqew%3D&reserved=0cuml-cu12==24.10.*
-#pip install cuml-cu12
-#pip install --extra-index-url https://pypi.nvidia.com cuml-cu12
+# Install shiftc
+WORKDIR /app
+RUN git clone --single-branch --branch master https://github.com/pkolano/shift.git && \
+    cd shift/c && \
+    make nolustre && \
+    cd ../ && \
+    install -m 755 perl/shiftc /usr/local/bin/ && \
+    install -m 755 c/shift-bin /usr/local/bin/ && \
+    install -m 755 perl/shift-mgr /usr/local/bin/ && \
+    install -m 644 etc/shiftrc /etc/ && \
+    install -m 755 perl/shift-aux /usr/local/bin/ && \
+    install -m 755 c/shift-bin /usr/local/bin/ && \
+    export LC_ALL=en_US.UTF-8 && \
+    export LANG=en_US.UTF-8 && \
+    locale-gen en_US.UTF-8 && \
+    rm -rf /app
 
+# Pip
+RUN pip install \
+    numpy \
+    certifi \
+    xarray \
+    pandas \
+    h5py \
+    pyhdf \
+    pyproj \
+    scikit-learn \
+    scikit-image \
+    geopandas \
+    tifffile \
+    webcolors \
+    pytest \
+    coveralls \
+    rtree \
+    GDAL==`ogrinfo --version | grep -Eo '[0-9]\.[0-9]\.[0-9]+'`
+ 
 #-------------------------------------------------------------------------------
 # modis-vcf Git Dependencies
 #-------------------------------------------------------------------------------
-
-RUN git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git $PROJECT_PATH/core
+RUN mkdir -p "/usr/local/ilab" && \
+    git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/core.git \
+        /usr/local/ilab/core && \
+    git clone --single-branch --branch main https://github.com/nasa-nccs-hpda/modis_vcf.git \
+        /usr/local/ilab/modis_vcf
+ 
+HEALTHCHECK NONE
+ENTRYPOINT []
+CMD ["/bin/bash"]
 
