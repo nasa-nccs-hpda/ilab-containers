@@ -15,7 +15,7 @@ ENV PYTHONPATH=$PYTHONPATH:/usr/local/ilab/
 ENV PROJECT_PATH="/usr/local/ilab/"
 
 #RUN mkdir -p $PROJECT_PATH
-RUN mkdir -p /usr/local/ilab/
+RUN sudo mkdir -p /usr/local/ilab
 #RUN chmod a+rwx -R $PROJECT_PATH/*
 RUN chmod a+rwx -R /usr/local/ilab/
 #-------------------------------------------------------------------------------
