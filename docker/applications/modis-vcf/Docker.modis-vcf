@@ -1,7 +1,8 @@
 #FROM gtamkin/ilab-base-gdal-3.3.3-v2:latest
 #FROM docker://nasanccs/ilab-base:latest
 #FROM ghcr.io/osgeo/gdal:ubuntu-full-3.9.2
-FROM docker://rapidsai/rapidsai-cloud-ml:22.10-cuda11.2-base-ubuntu20.04-py3.9
+#FROM docker://rapidsai/rapidsai-cloud-ml:22.10-cuda11.2-base-ubuntu20.04-py3.9
+FROM nvcr.io/nvidia/rapidsai/base:24.10-cuda12.5-py3.10
 
 #-------------------------------------------------------------------------------
 # - 1/12/23  modis-vcf 1.0.0 -initial container built with pyarrow
