@@ -1,12 +1,12 @@
 # Arguments to pass to the image
-ARG VERSION_DATE=24.12
-ARG CUDA_VERSION=12.5
-ARG PYTHON_VERSION=3.10
-ARG FROM_IMAGE=nvcr.io/nvidia/rapidsai/base
+ARG RAPIDS_VER=24.12
+ARG CUDA_VER=12.5
+ARG PYTHON_VERS=3.10
+ARG FROM_IMAGE=rapidsai/base
 
 # nvcr.io/nvidia/rapidsai/base:24.12-cuda12.5-py3.10
 # Import RAPIDS container as the BASE Image (cuda base image)
-FROM ${FROM_IMAGE}:${VERSION_DATE}-cuda${CUDA_VERSION}-py${PYTHON_VERSION}
+FROM ${FROM_IMAGE}:${RAPIDS_VER}-cuda${CUDA_VER}-py${PYTHON_VER}
  
 #-------------------------------------------------------------------------------
 # - 1/12/23  modis-vcf 1.0.0 -initial container built with pyarrow
