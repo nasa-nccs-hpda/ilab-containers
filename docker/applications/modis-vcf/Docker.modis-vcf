@@ -96,7 +96,7 @@ RUN pip install \
     pytest \
     coveralls \
     rtree \
-    GDAL==`ogrinfo --version | grep -Eo '[0-9]\.[0-9]\.[0-9]+'` \
+    GDAL \
     flake8
 
 HEALTHCHECK NONE
