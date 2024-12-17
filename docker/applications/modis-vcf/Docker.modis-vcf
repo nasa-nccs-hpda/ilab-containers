@@ -1,7 +1,7 @@
 # Arguments to pass to the image
 ARG RAPIDS_VER=24.12
 ARG CUDA_VER=12.5
-ARG PYTHON_VERS=3.10
+ARG PYTHON_VER=3.10
 ARG FROM_IMAGE=rapidsai/base
 
 # nvcr.io/nvidia/rapidsai/base:24.12-cuda12.5-py3.10
@@ -19,6 +19,8 @@ FROM ${FROM_IMAGE}:${RAPIDS_VER}-cuda${CUDA_VER}-py${PYTHON_VER}
 ENV DEBIAN_FRONTEND noninteractive
 ENV CPLUS_INCLUDE_PATH="/usr/include/gdal"
 ENV C_INCLUDE_PATH="/usr/include/gdal"
+
+RUN apt-get -y update
 
 # System dependencies
 RUN apt-get update && \
