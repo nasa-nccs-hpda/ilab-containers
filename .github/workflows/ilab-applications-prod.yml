@@ -53,5 +53,5 @@ jobs:
           context: .
           file: ./docker/applications/modis-vcf/Docker.modis-vcf
           push: true
-          tags: nasanccs/modis-vcf:latest
+          tags: nasanccs/modis-vcf:2.0.0
           
