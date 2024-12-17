@@ -19,6 +19,8 @@ ENV C_INCLUDE_PATH="/usr/include/gdal"
 ENV PROJ_LIB="/usr/share/proj"
 ENV PROJ_DATA="/usr/share/proj"
 
+RUN apt-get -y update
+
 #-------------------------------------------------------------------------------
 # System Dependencies
 #-------------------------------------------------------------------------------
