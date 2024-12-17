@@ -101,10 +101,22 @@ jobs:
       - 
         name: Lower github-runner storage
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          # Remove software and language runtimes we're not using
+          sudo rm -rf \
+            "$AGENT_TOOLSDIRECTORY" \
+            /opt/google/chrome \
+            /opt/microsoft/msedge \
+            /opt/microsoft/powershell \
+            /opt/pipx \
+            /usr/lib/mono \
+            /usr/local/julia* \
+            /usr/local/lib/android \
+            /usr/local/lib/node_modules \
+            /usr/local/share/chromium \
+            /usr/local/share/powershell \
+            /usr/share/dotnet \
+            /usr/share/swift
+          df -h /
 
       -
         name: Build and push
@@ -113,5 +125,5 @@ jobs:
           context: .
           file: ./docker/applications/modis-vcf/Docker.modis-vcf
           push: true
-          tags: nasanccs/modis-vcf:2.0
+          tags: nasanccs/modis-vcf:latest
           
