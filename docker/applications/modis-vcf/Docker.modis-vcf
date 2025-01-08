@@ -62,7 +62,6 @@ RUN apt-get update && \
         libfreetype6-dev \ 
         locales \
         gdal-bin \
-        libhdf4-dev \
         libgdal-dev && \
     apt-get -y autoremove && \
     rm -rf /var/cache/apt /var/lib/apt/lists/*
