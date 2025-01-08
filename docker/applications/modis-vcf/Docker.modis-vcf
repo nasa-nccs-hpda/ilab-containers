@@ -64,7 +64,7 @@ RUN apt-get update && \
         libhdf4-alt-dev \
         proj-bin \
         libproj-dev \
-        libgdal-dev \
+#        libgdal-dev \
         gdal-bin && \
     apt-get -y autoremove && \
     rm -rf /var/cache/apt /var/lib/apt/lists/*
