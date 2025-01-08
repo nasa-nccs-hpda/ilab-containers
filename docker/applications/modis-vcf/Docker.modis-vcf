@@ -63,6 +63,7 @@ RUN apt-get update && \
         locales \
         proj-bin \
         libproj-dev \
+        libhdf4-alt-dev \
         gdal-bin \
         libgdal-dev && \
     apt-get -y autoremove && \
