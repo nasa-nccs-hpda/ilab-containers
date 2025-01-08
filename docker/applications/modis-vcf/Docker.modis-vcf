@@ -61,6 +61,9 @@ RUN apt-get update && \
         libpng-dev \
         libfreetype6-dev \ 
         locales \
+        libhdf4-dev \
+        proj-bin \
+        libproj-dev \
         gdal-bin \
         libgdal-dev && \
     apt-get -y autoremove && \
