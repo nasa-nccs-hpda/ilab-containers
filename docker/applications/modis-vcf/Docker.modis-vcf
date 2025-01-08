@@ -61,11 +61,11 @@ RUN apt-get update && \
         libpng-dev \
         libfreetype6-dev \ 
         locales \
+        libhdf4-alt-dev \
         proj-bin \
         libproj-dev \
-        libhdf4-alt-dev \
-        gdal-bin \
-        libgdal-dev && \
+        libgdal-dev \
+        gdal-bin && \
     apt-get -y autoremove && \
     rm -rf /var/cache/apt /var/lib/apt/lists/*
 
