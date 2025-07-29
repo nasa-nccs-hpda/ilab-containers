@@ -1,0 +1,109 @@
+# vhr-toolkit combined container
+FROM ghcr.io/osgeo/gdal:ubuntu-full-3.9.2
+
+# Arguments to pass to the image
+ARG PROJECT_PATH="/usr/local/ilab"
+
+# Environment
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+ENV REDIS_PORT="6379"
+ENV REDIS_FILE="/etc/profile.d/redis_server.sh"
+
+# Ubuntu needs noninteractive to be forced
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CPLUS_INCLUDE_PATH="/usr/include/gdal"
+ENV C_INCLUDE_PATH="/usr/include/gdal"
+ENV PROJ_LIB="/usr/share/proj"
+ENV PROJ_DATA="/usr/share/proj"
+ENV PYTHONPATH="$PYTHONPATH:/usr/local/ilab"
+
+RUN PROJECT_PATH="/usr/local/ilab" && \
+    REDIS_FILE="/etc/profile.d/redis_server.sh" && \
+    echo $PROJECT_PATH && \
+    mkdir -p $PROJECT_PATH && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3-pip python3-dev wget vim curl git procps gcc g++ bzip2 libssl-dev \
+        libsqlite3-dev libx11-dev libgeos++-dev libproj-dev \
+        build-essential parallel libdatetime-perl gawk util-linux bc \
+        python3-tk tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev \
+        zlib1g-dev liblzma-dev libgirepository1.0-dev libcairo2-dev \
+        pkg-config gir1.2-gtk-3.0 libnetcdf-dev libhdf4-dev 2to3 && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/apt
+
+RUN rm -rf /usr/lib/python*/EXTERNALLY-MANAGED && \
+    pip install pipx && \
+    pip install rasterio && \
+    pip install awscli s3fs && \
+    pip install celery[redis] && \
+    pip install certifi && \
+    pip install cryptography && \
+    pip install Cython && \
+    pip install dask && \
+    pip install decorator && \
+    pip install dill && \
+    pip install distributed && \
+    pip install docutils && \
+    pip install fiona && \
+    pip install flower && \
+    pip install geopandas && \
+    pip install h5py && \
+    pip install imageio && \
+    pip install ipykernel && \
+    pip install ipython && \
+    pip install ipython-genutils && \
+    pip install ipywidgets && \
+    pip install matplotlib && \
+    pip install netcdf4 && \
+    pip install networkx && \
+    pip install notebook && \
+    pip install numba && \
+    pip install numexpr && \
+    pip install numpy && \
+    pip install pandas && \
+    pip install pyhdf && \
+    pip install pyproj && \
+    pip install Pysal && \
+    pip install PyYAML && \
+    pip install rasterio && \
+    pip install redis && \
+    pip install requests && \
+    pip install rioxarray && \
+    pip install scikit-image && \
+    pip install scikit-learn && \
+    pip install scipy && \
+    pip install seaborn && \
+    pip install shapely && \
+    pip install cartopy && \
+    pip install xarray && \
+    pip install urllib3 && \
+    pip install zarr && \
+    pip install earthengine-api cubo[ee] && \
+    pip install 2to3 psycopg2-binary && \
+    pip install plotnine && \
+    pip install --upgrade pylr2 && \
+    pip install git+https://github.com/dshean/pygeotools.git@master && \ 
+    pip install xgboost && \ 
+    pip install pytest && \ 
+    pip install coveralls && \ 
+    pip cache purge
+
+RUN PROJECT_PATH="/usr/local/ilab" && \
+    REDIS_FILE="/etc/profile.d/redis_server.sh" && \
+    echo $PROJECT_PATH && \
+    mkdir -p $PROJECT_PATH && \
+    # Add redis-server binary to /usr/local/bin
+    export pyVer=`python --version | awk -F' ' '{print $2}' | awk -F'.' '{print $1"."$2}'` && \
+    ln -sf /usr/local/lib/python${pyVer}/dist-packages/redis_server/bin/redis-server /usr/local/bin/redis-server && \
+    echo "redis-server --daemonize yes --port \$REDIS_PORT" >> $REDIS_FILE && \
+    echo "export SINGULARITYENV_REDIS_PORTS=\$REDIS_PORT" >> $REDIS_FILE && \
+    chmod +x $REDIS_FILE & \
+    mkdir -p "/usr/local/ilab" && \
+    chmod a+rwx -R /usr/local/ilab/*
+
+HEALTHCHECK NONE
+ENTRYPOINT []
+CMD ["/bin/bash"]

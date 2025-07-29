@@ -39,6 +39,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./requirements/Dockerfile
+          file: ./docker/ilab-base/Dockerfile.dev
           push: true
           tags: nasanccs/ilab-base:dev
